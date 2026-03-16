@@ -1,0 +1,16 @@
+./DS_Store
+*/.DS_Store
+bin/*
+obj/*
+.vscode
+callgrind.out.*
+data/*
+doc/*
+*.tgz
+.DS_Store
+TD_moduleImage
+._.DS_Store
+build/*
+
+!*/.gitkeep 
+!doc/doxyfile
