@@ -9,13 +9,18 @@ void Camera2D::move(float deltaX, float deltaY) {
     y += deltaY;
 }
 
+void Camera2D::setPosition(float newX, float newY) {
+    x = newX;
+    y = newY;
+}
+
 void Camera2D::setZoom(float newZoom) {
-    zoom = clamp(newZoom, 4.0f, 4096.0f);
+    zoom = clamp(newZoom, 5.0f, 100.0f);
+    //std::cout << zoom << std::endl; 
 }
 
 void Camera2D::zoomAt(float newZoom, int mouseX, int mouseY) {
     float oldZoom = zoom;
-    
     setZoom(newZoom);
     if (zoom == oldZoom) return;
 
@@ -27,4 +32,45 @@ void Camera2D::zoomAt(float newZoom, int mouseX, int mouseY) {
     // multipliée par le NOUVEAU zoom retombe exactement sur le (mouseX, mouseY)
     x = (worldX * zoom) - mouseX;
     y = (worldY * zoom) - mouseY;
+}
+
+bool Camera2D::testRegression() {
+    std::cout << "[Test] Camera2D... ";
+    bool allPassed = true;
+
+    // Fonction lambda utilitaire pour comparer des flottants en interne
+    auto isClose = [](float a, float b) { return std::abs(a - b) < 0.001f; };
+
+    // Instance dédiée au test
+    Camera2D cam;
+
+    // Test 1 : Valeurs par défaut du constructeur
+    // Remplacez 0.0f et 1.0f par vos vraies valeurs d'initialisation
+    if (!isClose(cam.x, 0.0f) || !isClose(cam.y, 0.0f) || !isClose(cam.zoom, 32.0f)|| !isClose(cam.speed, 50.0f)) {
+        cerr << "[ECHEC] Constructeur : valeurs initiales incorrectes." << endl;
+        allPassed = false;
+    }
+
+    // Test 2 : Méthode move()
+    cam.move(15.5f, -4.2f);
+    if (!isClose(cam.x, 15.5f) || !isClose(cam.y, -4.2f)) {
+        cerr << "[ECHEC] move() : la position n'a pas ete mise a jour correctement." << endl;
+        allPassed = false;
+    }
+
+    // Test 3 : Méthode setZoom()
+    cam.setZoom(5.0f);
+    if (!isClose(cam.zoom, 5.0f)) {
+        cerr << "[ECHEC] setZoom() : le zoom n'a pas ete applique." << endl;
+        allPassed = false;
+    }
+
+    // Conclusion
+    if (allPassed) {
+        cout << "OK" << endl;
+    } else {
+        cerr << "[ERREUR] Camera2D presente des regressions." << endl;
+    }
+
+    return allPassed;
 }

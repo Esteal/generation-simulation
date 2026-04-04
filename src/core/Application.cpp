@@ -1,57 +1,124 @@
 #include "Application.h"
+#include "KeyboardHandler.h"
+#include <iostream>
 
 Application::Application(size_t width, size_t height, size_t mapWidth, size_t mapHeight, int seed) 
-    : isRunning(true), map(mapWidth, mapHeight), 
-    window("test", width, height),
-    camera(), textureManager(), 
-    width(width), height(height) 
+    : isRunning(true),
+    window("Generation Simulation", width, height),
+    textureManager(), 
+    camera(),
+    width(width), height(height),
+    map(mapWidth, mapHeight), 
+    worldSimulator(false), generator(seed)
 {
-    MapGenerator generator(seed);
-    generator.generate(map, 0.7f, 0.01f, 0.01f);
-    HydrologieSystem hydrologie(100.0f);
-    hydrologie.process(map, 0.0f);
-    textureManager.load("spritesheet", "spritesheet.png", window);
+    generator.generate(map);
+    
+    // algos de simulation ayant besoin de temps (deltaTime) qui s'écoule pour marquer le terrain
+    worldSimulator.addSystem(new HydrolicErosionSystem());
+    worldSimulator.addSystem(new ThermalErosionSystem());
+    //std::cout << "Application de l'érosion hydraulique..." << std::endl;
+    worldSimulator.update(map, 3.0f);
+    
+    generator.setBiome(map);
+    generator.generateFromBiome(map);
+    // printBiomeMap();
+    // algos ayant besoin de temps (deltaTime) à 0 pour s'exécuter une seule fois au lancement
+    worldSimulator.addSystem(new HydrologieSystem(50.0f));
+    worldSimulator.addSystem(new LightSystem());
+    worldSimulator.addSystem(new VegetationSystem());
+    worldSimulator.addSystem(new CivilisationSystem());
+    worldSimulator.update(map, 0.0f);
+
+    worldSimulator.removeSystem(worldSimulator.getSystem(0)); // Retire l'érosion hydraulique après la phase de génération initiale
+    worldSimulator.removeSystem(worldSimulator.getSystem(0)); // Retire l'érosion thermique après la phase de génération initiale
+    textureManager.load("sprite2D", "spritesheet2D.png", window);
+    textureManager.load("sprite2DIso", "spritesheet2DIso.png", window);
 }
 
-void Application::keyboardInput()   
+
+void Application::simulate(Uint32 &currentTime, Uint32 &lastUpdateTime)
 {
-    SDL_Event events;
-    int mouseX, mouseY;
-    while (SDL_PollEvent(&events)) {
-        if (events.type == SDL_QUIT) {
-            isRunning = false; 
-        } else if (events.type == SDL_KEYDOWN) {
-            if (events.key.keysym.sym == SDLK_ESCAPE) {
-                isRunning = false; 
-            }
-            SDL_GetMouseState(&mouseX, &mouseY);
-            if (events.key.keysym.sym == SDLK_x) {
-                camera.zoomAt(camera.getZoom() + 0.1f, mouseX, mouseY);
-            }
-            else if (events.key.keysym.sym == SDLK_c) {
-                camera.zoomAt(camera.getZoom() - 0.1f, mouseX, mouseY);
-            }
-        }
+    currentTime = SDL_GetTicks();
+    if(currentTime - lastUpdateTime >= 1000)
+    {
+        worldSimulator.update(map, 10);
+        //generator.setBiome(map);
+        //worldSimulator.update(map, 0.0f);
+        lastUpdateTime = currentTime;
+        ++age;
+        cout << "Années écoulées : " << age << endl;
     }
-    const Uint8* state = SDL_GetKeyboardState(NULL);
-    
-    
-    if (state[SDL_SCANCODE_UP])    camera.move(0, -camera.getSpeed());
-    if (state[SDL_SCANCODE_DOWN])  camera.move(0, camera.getSpeed());
-    if (state[SDL_SCANCODE_LEFT])  camera.move(-camera.getSpeed(), 0);
-    if (state[SDL_SCANCODE_RIGHT]) camera.move(camera.getSpeed(), 0);
 }
 
 void Application::run()
 {
     int mouseX, mouseY;
+    Uint32 lastUpdateTime = SDL_GetTicks();
+    Uint32 currentTime;
+    KeyboardHandler::displayControls();
     while(isRunning)
     {
         // texturing -> rendering -> affichage    
-        keyboardInput();
+        KeyboardHandler::keyboardInput(*this);
         window.clear();
         SDL_GetMouseState(&mouseX, &mouseY);
-        mapRenderer.render2D(map, window, textureManager, camera, width, height, mouseX, mouseY);
+
+        switch (currentViewMode) {
+            case ViewMode::ISOMETRIC:
+                mapRendererIso.render2D(map, window, textureManager, camera, width, height, mouseX, mouseY, "sprite2DIso");
+                break;
+            case ViewMode::NORMAL_2D:
+                mapRenderer.render2D(map, window, textureManager, camera, width, height, mouseX, mouseY, "sprite2D");
+                break;
+            case ViewMode::HEATMAP_HUMIDITY:
+                mapRenderer.renderHeatmap(map, window, camera, width, height, HeatmapType::HUMIDITY);
+                break;
+            case ViewMode::HEATMAP_TEMPERATURE:
+                mapRenderer.renderHeatmap(map, window, camera, width, height, HeatmapType::TEMPERATURE);
+                break;
+            case ViewMode::HEATMAP_ALTITUDE:
+                mapRenderer.renderHeatmap(map, window, camera, width, height, HeatmapType::ALTITUDE);
+                break;
+            case ViewMode::HEATMAP_LIGHT:
+                mapRenderer.renderHeatmap(map, window, camera, width, height, HeatmapType::LIGHT);
+                break;
+            case ViewMode::HEATMAP_VEGETATION:
+                mapRenderer.renderHeatmap(map, window, camera, width, height, HeatmapType::VEGETATION);
+                break;
+            default:
+                mapRendererIso.render2D(map, window, textureManager, camera, width, height, mouseX, mouseY, "sprite2DIso");
+                break;
+        }
+        
         window.present();
+        
+        if(/*false*/!worldSimulator.isPause())
+            simulate(currentTime, lastUpdateTime);
+    }
+}
+
+bool Application::testRegression()
+{
+    std::cout << "[Test] Application (Integration globale)... ";
+    
+    try {
+        Application app(100, 100, 10, 10, 55);
+        
+        Uint32 currentTime = 1000;
+        Uint32 lastUpdateTime = 0;
+        
+        app.simulate(currentTime, lastUpdateTime);
+        
+        KeyboardHandler::keyboardInput(app);
+        
+        std::cout << "OK" << std::endl;
+        return true;
+        
+    } catch (const std::exception& e) {
+        std::cerr << "\nErreur critique lors du test d'integration : " << e.what() << std::endl;
+        return false;
+    } catch (...) {
+        std::cerr << "\nErreur inconnue lors du test d'integration." << std::endl;
+        return false;
     }
 }

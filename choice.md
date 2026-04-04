@@ -1,3 +1,33 @@
+# L'Équation d'Éboulement (Érosion Thermique)
+
+Formule calculant la quantité de matière qui s'effondre :
+
+$$\Delta h = c \cdot (\Delta H_{max} - \tau)$$
+
+*Condition d'activation : L'équation n'est calculée que si* $\Delta H_{max} > \tau$
+
+**Détail des variables :**
+
+* **$\Delta h$ (Matière transférée)** : La quantité exacte de matière (sédiments en priorité, puis roche) qui glisse de la cellule instable vers sa voisine la plus basse lors d'une itération.
+* **$c$ (Friction)** : Représente la viscosité du matériau. Elle détermine quelle proportion du surplus instable tombe en une seule étape (souvent autour de `0.5`), ce qui permet d'adoucir la chute et d'éviter de creuser des trous artificiels.
+* **$\Delta H_{max}$ (Pente maximale)** : La différence d'altitude la plus forte mesurée entre la cellule étudiée et ses voisines directes plus basses.
+* **$\tau$ (Talus Angle / Angle de repos)** : La pente critique maximale tolérée par la géologie locale. Si la pente du terrain est inférieure ou égale à cette valeur, le sol est considéré comme stable et la gravité n'a plus d'effet.
+
+# L'Équation du Stream Power (Érosion Hydraulique)
+
+Formule mathématique :
+
+$$E = K \cdot A^m \cdot S^n$$
+
+**Explications :**
+
+* **$E$ (Stream Power / Puissance du flux)** : La force érosive du courant, correspondant à la quantité de matière (sédiments puis roche) arrachée à la cellule lors d'une itération.
+* **$K$ (Constante d'érodabilité)** : La puissance de base de l'érosion. Elle représente la friabilité globale du terrain.
+* **$A$ (Aire de drainage / Accumulation)** : Le volume d'eau total traversant la cellule.
+* **$m$ (Exposant d'accumulation)** : Paramètre l'impact du volume d'eau, modulant l'avantage des grands fleuves par rapport aux petits ruisseaux.
+* **$S$ (Pente / Slope)** : La déclivité locale du terrain (différence d'altitude entre la cellule actuelle et sa voisine la plus basse).
+* **$n$ (Exposant de la pente)** : il définit l'importance de la verticalité dans le processus d'érosion.
+
 # Explication du fonctionnement de l'algorithme de création de rivière
 
 ## Tâche 1 : Initialisation de la pluie (`initializeWaterMapAndLandCells`)
@@ -60,3 +90,18 @@
 
 * **Combinaison de 3 bruits de Perlin/Simplex :** Actuellement, le système utilise 3 cartes de bruit différentes. Leur combinaison permet d'obtenir une génération procédurale plus organique avec un aléatoire contrôlé pour déterminer des biomes intéressants.
 * **Exemple d'application :** En croisant ces données, pour une altitude et une température données, le niveau d'humidité (le 3ème bruit) permettra de trancher naturellement entre la création d'une jungle (haute humidité) ou d'un désert (faible humidité).
+
+Notes :
+sudo apt-get install cloc
+cloc --include-lang="C++,C/C++ Header" .
+
+théorie pour l'occlusion ambiante :
+1. Pour chaque cellule, on lance des rayons dans Nd​ directions (ex: 8 directions cardinales et diagonales).
+
+2. Pour chaque rayon, on avance pas à pas jusqu'à un rayon maximum R.
+
+3. On calcule l'angle d'élévation α entre la case de départ et la case testée.
+
+4. On conserve l'angle maximum trouvé h(θ).
+
+5. La lumière finale de la case est de 1.0 (pleine lumière) moins la moyenne des ombres générées par les plus hauts sommets dans chaque direction, en appliquant une atténuation W(θ) selon la distance

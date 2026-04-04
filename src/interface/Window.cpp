@@ -1,15 +1,16 @@
 #include "Window.h"
 
+#include "Window.h"
+
 Window::Window(const string &title, const int &width, const int &height)
     : window(nullptr), renderer(nullptr), isInitialized(false)
 {
-// Initialisation de SDL
-    cout << "SDL: init" << endl;
+    // Initialisation de SDL
+    // cout << "SDL: init" << endl;
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
         cout << "Erreur lors de l'initialisation de la SDL : " << SDL_GetError() << endl;
-        SDL_Quit();
-        exit(1);
+        return; 
     }
 
     // Initialisation de SDL_image pour les textures png
@@ -17,16 +18,17 @@ Window::Window(const string &title, const int &width, const int &height)
     if (!(IMG_Init(imgFlags) & imgFlags)) {
         cout << "Erreur lors de l'initialisation de SDL_image : " << IMG_GetError() << endl;
         SDL_Quit();
-        exit(1);
+        return; 
     }
 
     // Creation de la fenetre
     window = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
-    if (window == NULL)
+    if (window == nullptr)
     {
         cout << "Erreur lors de la creation de la fenetre : " << SDL_GetError() << endl;
+        IMG_Quit();
         SDL_Quit();
-        exit(1);
+        return; 
     }
 
     // Création du renderer
@@ -34,16 +36,20 @@ Window::Window(const string &title, const int &width, const int &height)
     if (renderer == nullptr) {
         cout << "Erreur lors de la creation du renderer : " << SDL_GetError() << endl;
         SDL_DestroyWindow(window);
+        IMG_Quit();
         SDL_Quit();
-        exit(1);
+        return; 
     }
+    
     isInitialized = true;   
 }
 
 Window::~Window() 
 { 
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
+    if (renderer != nullptr)
+        SDL_DestroyRenderer(renderer);
+    if (window != nullptr)
+        SDL_DestroyWindow(window);
     IMG_Quit();
     SDL_Quit();
 }
@@ -70,8 +76,8 @@ SDL_Texture* Window::loadTexture(const string& filePath)
     
     SDL_Texture* texture = IMG_LoadTexture(renderer, filePath.c_str());
     
-    if (texture == nullptr)
-        cout << "Erreur de chargement de l'image " << filePath << " : " << IMG_GetError() << endl;
+    //if (texture == nullptr)
+        //cout << "Erreur de chargement de l'image " << filePath << " : " << IMG_GetError() << endl;
     
     return texture;
 }
@@ -109,4 +115,29 @@ void Window::drawTexture(SDL_Texture* texture, int x, int y, int w, int h)
     destRect.h = h;
 
     SDL_RenderCopy(renderer, texture, nullptr, &destRect);
+}
+
+bool Window::testRegression() {
+    std::cout << "[Test] Window (SDL2)... ";
+    
+    Window win("Test Regression", 100, 100);
+    
+    if (!win.getIsInitialized()) {
+        std::cerr << "\nErreur: La fenetre ou la SDL n'a pas pu s'initialiser correctement." << std::endl;
+        return false; 
+    }
+    
+    win.clear();
+    win.present();
+    
+    SDL_Texture* badTex = win.loadTexture("cheming_pas_net.png");
+    if (badTex != nullptr) {
+        std::cerr << "\nErreur: loadTexture a retourne un pointeur valide pour un fichier inexistant." << std::endl;
+        return false;
+    }
+    
+    win.drawTexture(nullptr, 0, 0, 50, 50);
+    
+    std::cout << "OK" << std::endl;
+    return true;
 }
