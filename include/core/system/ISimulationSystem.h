@@ -45,6 +45,16 @@ public:
      */
     void findSteepestNeighbor(const Map& map, int x, int y, float& outMaxDiff, int& outLowestX, int& outLowestY) const;
     
+    /**
+     * @brief Trouve l'indice 1D du voisin le plus bas autour d'une coordonnée (diagonale + cardinale).
+     * @param map La carte du monde.
+     * @param cx Position X de la cellule.
+     * @param cy Position Y de la cellule.
+     * @return L'index 1D (y * width + x) du voisin le plus bas, ou -1 si c'est une cuvette.
+     */
+    int getLowestNeighborIndex(const Map& map, int cx, int cy) const;
+
+
     void calculateAttractivity(Map& map);
     void calculateAttractivityForCell(Map& map, int x, int y);  
 

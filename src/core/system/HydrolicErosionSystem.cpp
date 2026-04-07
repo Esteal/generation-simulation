@@ -8,73 +8,67 @@ void HydrolicErosionSystem::process(Map& map, float deltaTime)
     size_t width = map.getWidth();
     size_t height = map.getHeight();
     size_t numCells = width * height;
+    
+    int totalIterations = static_cast<int>(deltaTime);
+    if (totalIterations <= 0) return;
 
-    for (int iter = 0; iter < static_cast<int>(deltaTime); ++iter) 
+    // On prépare nos buffers d'eau et de réception si nécessaire
+    if (water.size() != numCells) {
+        water.resize(numCells);
+        receivers.resize(numCells);
+    }
+
+    updateSortedCells(map);
+
+    for (int iter = 0; iter < totalIterations; ++iter) 
     {
-        vector<CellData> sortedCells = sortCellsByAltitude(map);
-        vector<float> water(numCells, 1.0f);
-        vector<int> receivers(numCells, -1); 
+        std::fill(water.begin(), water.end(), 1.0f);
+        std::fill(receivers.begin(), receivers.end(), -1);
+
         calculateDrainage(map, sortedCells, water, receivers);
         applyIncision(map, sortedCells, water, receivers);
     }
 }
 
-vector<CellData> HydrolicErosionSystem::sortCellsByAltitude(const Map& map) const 
+
+void HydrolicErosionSystem::updateSortedCells(const Map& map) 
 {
     size_t width = map.getWidth();
     size_t height = map.getHeight();
-    vector<CellData> sortedCells;
-    sortedCells.reserve(width * height);
+    size_t numCells = width * height;
+
+    // On ne redimensionne le vecteur que si la taille de la carte a changé (rare)
+    if (sortedCells.size() != numCells) {
+        sortedCells.resize(numCells);
+    }
     
+    size_t i = 0;
     for (int y = 0; y < static_cast<int>(height); ++y) {
         for (int x = 0; x < static_cast<int>(width); ++x) {
-            sortedCells.push_back({x, y, map.getAltitude(x, y)});
+            sortedCells[i++] = {x, y, map.getAltitude(x, y)};
         }
     }
 
     sort(sortedCells.begin(), sortedCells.end(), [](const CellData& a, const CellData& b) {
         return a.height > b.height;
     });
-
-    return sortedCells;
 }
 
 void HydrolicErosionSystem::calculateDrainage(const Map& map, const vector<CellData>& sortedCells, vector<float>& water, vector<int>& receivers) const 
 {
     size_t width = map.getWidth();
-    size_t height = map.getHeight();
-
-    int dx[] = {-1, 1, 0, 0, -1, 1, -1, 1};
-    int dy[] = {0, 0, -1, 1, -1, -1, 1, 1};
 
     for (const auto& c : sortedCells) {
         int cx = c.x;
         int cy = c.y;
         size_t cIndex = static_cast<size_t>(cy) * width + static_cast<size_t>(cx);
-        float currentHeight = map.getAltitude(cx, cy);
 
-        int lowestX = cx;
-        int lowestY = cy;
-        float lowestHeight = currentHeight;
+        int lowestIndex = getLowestNeighborIndex(map, cx, cy);
 
-        for (int i = 0; i < 8; ++i) {
-            int nx = cx + dx[i];
-            int ny = cy + dy[i];
-
-            if (nx >= 0 && nx < static_cast<int>(width) && ny >= 0 && ny < static_cast<int>(height)) {
-                float nHeight = map.getAltitude(nx, ny);
-                if (nHeight < lowestHeight) {
-                    lowestHeight = nHeight;
-                    lowestX = nx;
-                    lowestY = ny;
-                }
-            }
-        }
-
-        if (lowestX != cx || lowestY != cy) {
-            size_t lowestIndex = static_cast<size_t>(lowestY) * width + static_cast<size_t>(lowestX);
+        // Si lowestIndex est différent de -1, cela signifie que l'eau peut s'écouler
+        if (lowestIndex != -1) {
             water[lowestIndex] += water[cIndex];
-            receivers[cIndex] = static_cast<int>(lowestIndex); 
+            receivers[cIndex] = lowestIndex; 
         }
     }
 }

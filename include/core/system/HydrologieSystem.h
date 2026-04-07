@@ -27,9 +27,6 @@ struct TerrainCell
  * * Ce système calcule l'accumulation de l'eau de pluie en fonction de la topologie 
  * du terrain. Lorsque l'eau accumulée dépasse un certain seuil, elle creuse le sol 
  * pour former le lit d'une rivière de manière permanente.
- * * @todo Modifier le niveau d'humidité des cellules traversées après la création des rivières 
- * pour favoriser la pousse de la végétation sur les berges.
- * * @todo remplacer la méthode findLowestNeighbor par celle de l'interface
  */
 class HydrologieSystem : public ISimulationSystem 
 {
@@ -42,19 +39,24 @@ private:
     const float dropoff = 0.1f; /**< Perte d'humidité par case franchie (0.3f équivaut à un rayon max de ~3 cases - 0.1 -> ~10 cases). Plus la valeur est petite, plus l'humidité voyage loin. */
     const float diagDropoff = dropoff * 1.414f; // Perte en diagonale (racine de 2)
 
+    // --- Buffers persistants ---
+    std::vector<float> waterMap;
+    std::vector<TerrainCell> landCells;
+    std::vector<bool> riverMask;
+
     /**
      * @brief Initialise la carte des eaux et extrait la liste des cellules terrestres.
      * @param map La carte du monde.
      * @param[out] waterMap Vecteur stockant la quantité d'eau sur chaque cellule (initialisé à 1.0 par défaut).
      * @param[out] landCells Vecteur qui sera rempli avec uniquement les cellules situées au-dessus du niveau de la mer.
      */
-    void initializeWaterMapAndLandCells(const Map& map, vector<float>& waterMap, vector<TerrainCell>& landCells) const;
+    void initializeWaterMapAndLandCells(const Map& map);
 
     /**
      * @brief Effectue un tri topologique des cellules terrestres.
      * @param[in,out] landCells Vecteur de cellules terrestres à trier de la plus haute à la plus basse.
      */
-    void sortLandCellsByAltitude(vector<TerrainCell>& landCells) const;
+    void sortLandCellsByAltitude();
 
     /**
      * @brief Simule l'écoulement de l'eau de cellule en cellule vers les points les plus bas.
@@ -62,7 +64,7 @@ private:
      * @param[in,out] waterMap Vecteur accumulant les volumes d'eau transitant par chaque cellule.
      * @param landCells Les cellules terrestres triées par altitude décroissante.
      */
-    void routeWater(const Map& map, vector<float>& waterMap, const vector<TerrainCell>& landCells) const;
+    void routeWater(const Map& map);
 
     /**
      * @brief Creuse le lit des rivières là où l'eau s'est accumulée massivement.
@@ -70,17 +72,7 @@ private:
      * @param map La carte du monde à modifier.
      * @param waterMap Vecteur contenant les volumes d'eau finaux après écoulement.
      */
-    void carveRivers(Map& map, const vector<float>& waterMap) const;
-
-    /**
-     * @brief Cherche l'indice du voisin le plus bas autour d'une cellule donnée.
-     * @param map La carte du monde.
-     * @param cx Coordonnée X de la cellule centrale.
-     * @param cy Coordonnée Y de la cellule centrale.
-     * @param currentAlt Altitude de la cellule centrale.
-     * @return L'index 1D du voisin le plus bas dans la grille, ou -1 si la cellule est une cuvette (aucun voisin plus bas).
-     */
-    int findLowestNeighborIndex(const Map& map, int cx, int cy, float currentAlt) const;
+    void carveRivers(Map& map);
 
 public:
     /**

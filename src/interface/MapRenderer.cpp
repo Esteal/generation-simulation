@@ -184,23 +184,23 @@ void MapRenderer::renderHeatmap(const Map& map, Window& window, const Camera2D& 
             }
             else if (type == HeatmapType::VEGETATION) {
                 
-                FloraType flora = map.getGrid().get(x, y).flora;
+                Material material = map.getGrid().get(x, y).material;
                 
-                switch (flora) {
-                    case FloraType::GRASS:       
+                switch (material) {
+                    case Material::GRASS:       
                         r = 124; g = 204; b = 39;  break; // Vert pomme / clair
-                    case FloraType::MOSS:        
+                    case Material::MOSS:        
                         r = 255;  g = 255; b = 255;  break; // Vert olive sombre (Fonds humides)
-                    case FloraType::CACTUS:      
+                    case Material::CACTUS:      
                         r = 255; g = 150; b = 0;   break; // Orange vif (Pour bien repérer les 5% d'apparition !)
-                    case FloraType::PINE_TREE:   
+                    case Material::PINE_TREE:   
                         r = 47;  g = 79;  b = 79;  break; // Gris-vert sombre (Taïga)
-                    case FloraType::OAK_TREE:    
+                    case Material::OAK_TREE:    
                         r = 34;  g = 139; b = 34;  break; // Vert forêt classique
-                    case FloraType::JUNGLE_TREE: 
+                    case Material::JUNGLE_TREE: 
                         r = 0;   g = 80;  b = 0;   break; // Vert très sombre et profond
                     
-                    case FloraType::NONE:
+                    case Material::NONE:
                     default:
                         r = 0; g = 0; b = 0;
                         break;

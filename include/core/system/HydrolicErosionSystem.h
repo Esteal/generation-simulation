@@ -48,12 +48,14 @@ private:
      */
     float n = 1.0f;
 
+    vector<CellData> sortedCells;
+    vector<float> water;
+    vector<int> receivers;
+
     /**
-     * @brief Effectue un tri topologique de la carte.
-     * @param map La carte à analyser.
-     * @return Un vecteur contenant les données des cellules triées de la plus haute à la plus basse.
+     * @brief Met à jour le tableau interne sortedCells sans réallouer de mémoire.
      */
-    vector<CellData> sortCellsByAltitude(const Map& map) const;
+    void updateSortedCells(const Map& map);
 
     /**
      * @brief Simule l'écoulement de l'eau pour calculer l'aire de drainage de chaque cellule.

@@ -29,6 +29,32 @@ void ISimulationSystem::findSteepestNeighbor(const Map& map, int x, int y, float
     }
 }
 
+int ISimulationSystem::getLowestNeighborIndex(const Map& map, int cx, int cy) const {
+    int width = static_cast<int>(map.getWidth());
+    int height = static_cast<int>(map.getHeight());
+    
+    float currentAlt = map.getAltitude(cx, cy);
+    float minAlt = currentAlt;
+    int lowestIndex = -1;
+
+    for (int dy = -1; dy <= 1; ++dy) {
+        for (int dx = -1; dx <= 1; ++dx) {
+            if (dx == 0 && dy == 0) continue;
+
+            int nx = cx + dx;
+            int ny = cy + dy;
+            
+            if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+                float neighborAlt = map.getAltitude(nx, ny);
+                if (neighborAlt < minAlt) {
+                    minAlt = neighborAlt;
+                    lowestIndex = ny * width + nx;
+                }
+            }
+        }
+    }
+    return lowestIndex; 
+}
 
 void ISimulationSystem::calculateAttractivity(Map& map) {
     int width = static_cast<int>(map.getWidth());

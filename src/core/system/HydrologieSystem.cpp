@@ -6,22 +6,30 @@ HydrologieSystem::HydrologieSystem(float riverThreshold)
 
 void HydrologieSystem::process(Map& map, float deltaTime) 
 {
-    if(deltaTime != 0.0f) return;
+    if(deltaTime != 0.0f) return; 
+
     int width = map.getWidth();
     int height = map.getHeight();
+    int numCells = width * height;
 
-    vector<float> waterMap(width * height, 0.0f);
-    vector<TerrainCell> landCells;
-    landCells.reserve(width * height);
-    
-    initializeWaterMapAndLandCells(map, waterMap, landCells);
-    sortLandCellsByAltitude(landCells);
-    routeWater(map, waterMap, landCells);
-    carveRivers(map, waterMap);
+    if (waterMap.size() != static_cast<size_t>(numCells)) {
+        waterMap.resize(numCells, 0.0f);
+        riverMask.resize(numCells, false);
+    } else {
+        std::fill(waterMap.begin(), waterMap.end(), 0.0f);
+        std::fill(riverMask.begin(), riverMask.end(), false);
+    }
+    landCells.clear(); 
+    landCells.reserve(numCells); // Évite les réallocations pendant le push_back
+
+    initializeWaterMapAndLandCells(map);
+    sortLandCellsByAltitude();
+    routeWater(map);
+    carveRivers(map);
     diffuseHumidity(map);
-}    
+}
 
-void HydrologieSystem::initializeWaterMapAndLandCells(const Map& map, vector<float>& waterMap, vector<TerrainCell>& landCells) const
+void HydrologieSystem::initializeWaterMapAndLandCells(const Map& map)
 {
     size_t width = map.getWidth();
     size_t height = map.getHeight();
@@ -39,21 +47,21 @@ void HydrologieSystem::initializeWaterMapAndLandCells(const Map& map, vector<flo
     }
 }
 
-void HydrologieSystem::sortLandCellsByAltitude(vector<TerrainCell>& landCells) const
+void HydrologieSystem::sortLandCellsByAltitude()
 {
     sort(landCells.begin(), landCells.end(), [](const TerrainCell& a, const TerrainCell& b) {
         return a.alt > b.alt; 
     });
 }
 
-void HydrologieSystem::routeWater(const Map& map, vector<float>& waterMap, const vector<TerrainCell>& landCells) const
+void HydrologieSystem::routeWater(const Map& map)
 {
     int width = map.getWidth();
 
     for (const TerrainCell& current : landCells) {
         int currentIndex = current.y * width + current.x;
         
-        int lowestNeighborIndex = findLowestNeighborIndex(map, current.x, current.y, current.alt);
+        int lowestNeighborIndex = getLowestNeighborIndex(map, current.x, current.y);
 
         if (lowestNeighborIndex != -1) {
             waterMap[lowestNeighborIndex] += waterMap[currentIndex];
@@ -61,37 +69,7 @@ void HydrologieSystem::routeWater(const Map& map, vector<float>& waterMap, const
     }
 }
 
-int HydrologieSystem::findLowestNeighborIndex(const Map& map, int cx, int cy, float currentAlt) const
-{
-    int width = map.getWidth();
-    int height = map.getHeight();
-
-    float minAlt = currentAlt;
-    int lowestIndex = -1;
-
-    for (int dy = -1; dy <= 1; ++dy) {
-        for (int dx = -1; dx <= 1; ++dx) {
-            if (dx == 0 && dy == 0) continue;
-
-            int nx = cx + dx;
-            int ny = cy + dy;
-            
-            // Pour éviter de sortir de la grille
-            if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
-                float neighborAlt = map.getAltitude(nx, ny);
-                
-                if (neighborAlt < minAlt) {
-                    minAlt = neighborAlt;
-                    lowestIndex = ny * width + nx;
-                }
-            }
-        }
-    }
-
-    return lowestIndex; 
-}
-
-void HydrologieSystem::carveRivers(Map& map, const vector<float>& waterMap) const
+void HydrologieSystem::carveRivers(Map& map)
 {
     size_t width = map.getWidth();
     size_t height = map.getHeight();

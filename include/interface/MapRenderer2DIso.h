@@ -5,6 +5,7 @@
 #ifndef MAPRENDERER2DISO_H
 #define MAPRENDERER2DISO_H
 #include "MapRenderer.h"
+#include "Chunk.h"
 
 /**
  * @class MapRenderer2DIso
@@ -41,6 +42,9 @@ public:
      * * @return bool true si le test passe, false sinon.
      */
     static bool testRegression();
+    private:
+        Chunk* rootChunk = nullptr; // Pointeur vers la racine de ton arbre
 };
 
 #endif
+

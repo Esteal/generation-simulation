@@ -7,6 +7,15 @@ void MapRenderer2DIso::render2D(const Map& map, Window& window, TextureManager& 
                          const Camera2D& camera, const size_t &windowWidth, 
                          const size_t &windowHeight, const int &mouseX, const int &mouseY, const std::string &spritesheetID)
 {
+    if(rootChunk == nullptr) // 1. Initialisation de l'arbre de chunks (si pas déjà fait)
+    {
+        rootChunk = new Chunk(0, map.getWidth() - 1, 0, map.getHeight() - 1, map);
+    }
+    
+    // 2. Rendu à partir de la racine de l'arbre
+    rootChunk->render(window, textureManager, camera, map, spritesheetID, 
+                      (int)windowWidth, (int)windowHeight);
+    /*
     int srcSize = 64;
 
     float tileW = camera.getZoom();
@@ -94,6 +103,7 @@ void MapRenderer2DIso::render2D(const Map& map, Window& window, TextureManager& 
                                      destX, finalDestY, tileW, tileW);
         }
     }
+        */
 }
 
 bool MapRenderer2DIso::testRegression() {

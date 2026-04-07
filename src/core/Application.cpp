@@ -1,6 +1,7 @@
 #include "Application.h"
 #include "KeyboardHandler.h"
 #include <iostream>
+#include <Chunk.h>
 
 Application::Application(size_t width, size_t height, size_t mapWidth, size_t mapHeight, int seed) 
     : isRunning(true),
@@ -12,16 +13,12 @@ Application::Application(size_t width, size_t height, size_t mapWidth, size_t ma
     worldSimulator(false), generator(seed)
 {
     generator.generate(map);
-    
+
     // algos de simulation ayant besoin de temps (deltaTime) qui s'écoule pour marquer le terrain
     worldSimulator.addSystem(new HydrolicErosionSystem());
     worldSimulator.addSystem(new ThermalErosionSystem());
     //std::cout << "Application de l'érosion hydraulique..." << std::endl;
     worldSimulator.update(map, 3.0f);
-    
-    generator.setBiome(map);
-    generator.generateFromBiome(map);
-    // printBiomeMap();
     // algos ayant besoin de temps (deltaTime) à 0 pour s'exécuter une seule fois au lancement
     worldSimulator.addSystem(new HydrologieSystem(50.0f));
     worldSimulator.addSystem(new LightSystem());
@@ -41,7 +38,7 @@ void Application::simulate(Uint32 &currentTime, Uint32 &lastUpdateTime)
     currentTime = SDL_GetTicks();
     if(currentTime - lastUpdateTime >= 1000)
     {
-        worldSimulator.update(map, 10);
+        worldSimulator.update(map, 1);
         //generator.setBiome(map);
         //worldSimulator.update(map, 0.0f);
         lastUpdateTime = currentTime;

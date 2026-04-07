@@ -7,6 +7,7 @@ MapGenerator::MapGenerator(int seed)
     noiseAltitude.SetSeed(seed);
     noiseTemperature.SetSeed(seed + 1);
     noiseHumidity.SetSeed(seed + 2);
+    noiseGranular.SetSeed(seed + 3);
 
     noiseAltitude.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
 
@@ -16,11 +17,15 @@ MapGenerator::MapGenerator(int seed)
     noiseAltitude.SetFractalOctaves(4);      // 4 couches de détails (crée des micro-vallées)
     noiseAltitude.SetFractalLacunarity(2.0f); // La fréquence des petits détails
     noiseAltitude.SetFractalGain(0.25f);
-
+    
     noiseTemperature.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
     noiseTemperature.SetFrequency(0.005f);
+
     noiseHumidity.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
     noiseHumidity.SetFrequency(0.005f);
+    
+    noiseGranular.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
+    noiseGranular.SetFrequency(0.05f); 
 }
 
 void MapGenerator::setSeed(int newSeed)
@@ -33,35 +38,51 @@ void MapGenerator::setSeed(int newSeed)
 
 void MapGenerator::generate(Map &map)
 {  
+    
     //std::vector<float> altitudeValues(map.getWidth() * map.getHeight()); 
     for(size_t y = 0; y < map.getHeight(); ++y)
     {
         for(size_t x = 0; x < map.getWidth(); ++x)
         {
             Cell& cell = map.getGrid().get((float)x, (float)y);
+            float bonusRelief = 0.0f;
+            float fx = (float)x;
+             float fy = (float)y;
             //cell.bedrock = 1 - 2 * abs(noiseAltitude.GetNoise((float)x, (float)y)); // Valeurs entre 0 et 2, avec des montagnes plus hautes que les océans
             //float altNoise = noiseAltitude.GetNoise((float)x, (float)y);
             
             cell.bedrock = (1 + noiseAltitude.GetNoise((float)x, (float)y))/2.0f;
-           // /!\ à l'étape du bruit, bien la stocker dans bedrock, pas dans altitude ou gradiant
-           /* if(altNoise < -1.0f && altNoise <= -0.5f)
-                cell.altitude = (-5.0f + altNoise); // Océan profond
-            if(altNoise > -0.5f && altNoise <= -0.2f)
-            // je veux une interpolation linéaire entre -0.5 et -0.2 pour que les côtes soient plus douces
-                cell.altitude = -0.5f + ((1 + altNoise)/2.0f) * (-0.2f + 0.5f); // Côtes douces
-            if(altNoise > 0.0f && altNoise <= 0.5f)
-                cell.altitude = (0.5f + altNoise); // Terre ferme
-            if(altNoise > 0.5f && altNoise <= 1.0f)
-            */
-            //cell.altitude = (1.0f + altNoise); //  Montagne
-
-            //cell.altitude = std::abs(noiseAltitude.GetNoise((float)x, (float)y))*2;
             cell.temperature = (1 + noiseTemperature.GetNoise((float)x, (float)y))/2.0f;
             cell.humidity = (1 + noiseHumidity.GetNoise((float)x, (float)y))/2.0f;
-            cell.granular = 0.05f; 
+            cell.granular = (1 + noiseGranular.GetNoise((float)x, (float)y))/8.0f; 
             //cell.biome = determineBiome(cell.altitude, cell.temperature, cell.humidity);
             //altitudeValues[y * map.getWidth() + x] = cell.bedrock;
-            cell.biome = BiomeIndex::BEACH;
+            // cell.biome = BiomeIndex::BEACH;
+            cell.biome = determineBiome(cell.bedrock, cell.temperature, cell.humidity, cell.granular);
+            
+            switch (cell.biome) {
+                case BiomeIndex::MOUNTAINS:
+                    // On utilise un bruit de type "Ridge" (Slide 8) pour les pics
+                    bonusRelief = 1.0f - std::abs(noiseAltitude.GetNoise(fx * 2.0f, fy * 2.0f));
+                    cell.bedrock += bonusRelief * 0.5f; 
+                    break;
+
+                case BiomeIndex::DESERT:
+                    // On peut simuler des dunes avec un bruit directionnel ou sinusoïdal (Marble)
+                    bonusRelief = std::sin(fx * 0.2f + noiseAltitude.GetNoise(fx, fy) * 5.0f);
+                    cell.bedrock += bonusRelief * 0.05f;
+                    break;
+
+                case BiomeIndex::OCEAN:
+                    // On lisse le fond marin
+                    cell.bedrock *= 0.8f; 
+                    break;
+
+                default:
+                    // Bruit standard de turbulence pour les autres biomes
+                    cell.bedrock += noiseAltitude.GetNoise(fx * 4.0f, fy * 4.0f) * 0.1f;
+                    break;
+            }
         }
     }
 }

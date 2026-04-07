@@ -26,6 +26,7 @@ set(COMMON_SOURCES
     src/interface/MapRenderer.cpp
     src/interface/TextMapRenderer.cpp
     src/interface/KeyboardHandler.cpp
+    src/interface/Chunk.cpp
 )
 
 # ==========================================

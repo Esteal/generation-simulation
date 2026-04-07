@@ -32,6 +32,8 @@ private:
     /** @brief Générateur de bruit dédié à la carte d'humidité (précipitations). */
     FastNoiseLite noiseHumidity;
     
+    FastNoiseLite noiseGranular; /**< Générateur de bruit dédié à la distribution initiale de sédiments (granular). */
+
     /** @brief Graine aléatoire (seed) garantissant que le même nombre générera toujours le même monde. */
     int seed;
 

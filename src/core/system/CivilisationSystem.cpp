@@ -71,9 +71,10 @@ void CivilisationSystem::initializeCivilizations(Map& map)
             newCity.y = candidate.y;
             newCity.population = 100; // Population de départ
             newCity.factionId = currentFactionId++;
-            std::cout << "Création de la civilisation " << newCity.factionId 
+            /*std::cout << "Création de la civilisation " << newCity.factionId 
                       << " à (" << newCity.x << ", " << newCity.y << ") avec attractivité " 
                       << candidate.attractivity << std::endl;
+            */
             settlements.push_back(newCity);
             map.getGrid().get(candidate.x, candidate.y).isOccupied = true;
         }
@@ -150,9 +151,10 @@ void CivilisationSystem::evolveCivilizations(Map& map, float deltaTime)
                     newCity.y = bestY;
                     newCity.population = migrants;
                     newCity.factionId = settlement.factionId;
-                    std::cout << "Expansion de la civilisation " << newCity.factionId 
+                    /*std::cout << "Expansion de la civilisation " << newCity.factionId 
                               << " vers (" << newCity.x << ", " << newCity.y << ") avec population " 
                               << newCity.population << "Avec attractivité " << bestScore << std::endl;   
+                    */
                     newSettlements.push_back(newCity);
                     map.getGrid().get(bestX, bestY).isOccupied = true;
                 }
