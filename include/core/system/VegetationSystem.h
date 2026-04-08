@@ -7,8 +7,11 @@ class VegetationSystem : public ISimulationSystem
 {
 private:
     const float talusAngle = 0.5;
+    const float POLINIZATION_CHANCE = 0.1f; // 10% de chance de polinisation par seconde pour une cellule en stage 2
+    const float GROWTH_FACTOR = 0.5;
+    const float DEATH_FACTOR = 0.9;
     std::unordered_map<Material, int> RADIUS = {
-        {Material::GRASS, 4},
+        {Material::GRASS, 2},
         {Material::MOSS, 8},
         {Material::CACTUS, 2},
         {Material::PINE_TREE, 3},

@@ -152,8 +152,6 @@ void VegetationSystem::evolveVegetation(Map &map, float deltaTime)
 {
     int width = static_cast<int>(map.getWidth());
     int height = static_cast<int>(map.getHeight());
-    float growthFactor = 0.5;
-    float deathFactor = 0.9;
 
     for(int y = 0; y < height; ++y)
     {
@@ -161,7 +159,7 @@ void VegetationSystem::evolveVegetation(Map &map, float deltaTime)
         {
             Cell &cell = map.getGrid().get(x, y);
             
-            if (cell.material == Material::NONE) {
+            if (cell.material == Material::NONE && cell.pourcentageEvolution < 0.0f) {
                 continue;
             }
             
@@ -170,21 +168,23 @@ void VegetationSystem::evolveVegetation(Map &map, float deltaTime)
 
 
             if(cell.stage == Stage::STAGE_1) {
-                cell.pourcentageEvolution = std::min(cell.pourcentageEvolution + growthRate * deltaTime * growthFactor, 1.0f);
+                cell.pourcentageEvolution = std::min(cell.pourcentageEvolution + growthRate * deltaTime * GROWTH_FACTOR, 1.0f);
             }
             
             if(cell.pourcentageEvolution >= 1.0f || cell.stage == Stage::STAGE_2) {
 
                 cell.stage = Stage::STAGE_2;
-                cell.pourcentageEvolution -= growthRate * deltaTime * deathFactor;
-                polenization(map, x, y, cell.material);
-
+                cell.pourcentageEvolution -= growthRate * deltaTime * DEATH_FACTOR;
+                float pollenChance = POLINIZATION_CHANCE * deltaTime;
+                if (static_cast<float>(rand()) / static_cast<float>(RAND_MAX) < pollenChance) {
+                    polenization(map, x, y, cell.material);
+                }
                 if(cell.pourcentageEvolution < 0.4f)
                     cell.stage = Stage::STAGE_3;
                 
             }
             if (cell.stage == Stage::STAGE_3) {
-                cell.pourcentageEvolution -= growthRate * deltaTime * deathFactor;
+                cell.pourcentageEvolution -= growthRate * deltaTime * DEATH_FACTOR;
                 if(cell.pourcentageEvolution <= 0.0f) {
                     cell.material = Material::NONE;
                     cell.stage = Stage::STAGE_4;
@@ -201,6 +201,8 @@ void VegetationSystem::evolveVegetation(Map &map, float deltaTime)
         }
     }
 }
+
+
 
 void VegetationSystem::polenization(Map &map, int x, int y, Material material) {
     // TODO : 
@@ -228,7 +230,13 @@ void VegetationSystem::polenization(Map &map, int x, int y, Material material) {
 
             Cell &targetCell = map.getGrid().get(i, j);
             if(targetCell.material == Material::NONE && isSameSpeciesNearby) {
-                sowASeed(targetCell);
+                float survivalRate = calculateRate(material, targetCell.temperature, targetCell.humidity, targetCell.light, targetCell.granular);
+    
+                if (survivalRate > 0.01f && (static_cast<float>(rand()) / static_cast<float>(RAND_MAX)) < survivalRate) {
+                    targetCell.material = material;
+                    targetCell.stage = Stage::STAGE_1;
+                    targetCell.pourcentageEvolution = 0.0f;
+                }
             }
         }
     }
