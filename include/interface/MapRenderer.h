@@ -42,6 +42,16 @@ private:
     
     void renderSettlements(Window &window, const Camera2D &camera, const std::vector<Settlement> &settlements,
                             const size_t &windowWidth, const size_t &windowHeight);
+    
+    /**
+     * @brief Obtient la couleur RGBA pour un type de matériau donné.
+     * @param material Le type de matériau.
+     * @param r Référence pour la composante rouge.
+     * @param g Référence pour la composante verte.
+     * @param b Référence pour la composante bleue.
+     * @param a Référence pour la composante alpha (transparence).
+     */
+    void getMaterialColor(const Material& material, Uint8& r, Uint8& g, Uint8& b, Uint8& a) const;
                          
 public:
     /**

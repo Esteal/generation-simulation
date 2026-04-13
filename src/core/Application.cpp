@@ -22,6 +22,7 @@ Application::Application(size_t width, size_t height, size_t mapWidth, size_t ma
     // algos ayant besoin de temps (deltaTime) à 0 pour s'exécuter une seule fois au lancement
     worldSimulator.addSystem(new HydrologieSystem(50.0f));
     worldSimulator.addSystem(new LightSystem());
+    worldSimulator.addSystem(new MineralSystem());
     worldSimulator.addSystem(new VegetationSystem());
     worldSimulator.addSystem(new CivilisationSystem());
     worldSimulator.update(map, 0.0f);

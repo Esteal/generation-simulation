@@ -9,7 +9,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin")
 # 2. Sources communes (SANS main.cpp ni test_main.cpp)
 set(COMMON_SOURCES
     src/core/Application.cpp
-    src/core/Map.cpp
+    src/core/model/Map.cpp
     src/core/MapGenerator.cpp
     src/core/system/HydrologieSystem.cpp
     src/core/system/WorldSimulator.cpp
@@ -19,6 +19,7 @@ set(COMMON_SOURCES
     src/core/system/ISimulationSystem.cpp
     src/core/system/LightSystem.cpp
     src/core/system/CivilisationSystem.cpp
+    src/core/system/MineralSystem.cpp
     src/interface/Window.cpp
     src/interface/TextureManager.cpp
     src/interface/Camera2D.cpp
@@ -35,9 +36,11 @@ set(COMMON_SOURCES
 add_executable(main src/main.cpp ${COMMON_SOURCES})
 
 target_include_directories(main PRIVATE 
-    "${CMAKE_SOURCE_DIR}/include/core" 
     "${CMAKE_SOURCE_DIR}/include/interface"
+    "${CMAKE_SOURCE_DIR}/include/core" 
     "${CMAKE_SOURCE_DIR}/include/core/system"
+    "${CMAKE_SOURCE_DIR}/include/core/dependencies"
+    "${CMAKE_SOURCE_DIR}/include/core/model"
 )
 
 find_package(SDL2 REQUIRED)
@@ -53,9 +56,12 @@ add_executable(run_tests src/testRegression.cpp ${COMMON_SOURCES})
 
 # Inclusion des mêmes dossiers (header)
 target_include_directories(run_tests PRIVATE 
-    "${CMAKE_SOURCE_DIR}/include/core" 
     "${CMAKE_SOURCE_DIR}/include/interface"
+    "${CMAKE_SOURCE_DIR}/include/core" 
     "${CMAKE_SOURCE_DIR}/include/core/system"
+    "${CMAKE_SOURCE_DIR}/include/core/dependencies"
+    "${CMAKE_SOURCE_DIR}/include/core/model"
+
 )
 
 # On ajoute le flag "DEBUG_TESTS" UNIQUEMENT pour cet exécutable

@@ -41,10 +41,95 @@ void MapRenderer::render2D(const Map& map, Window& window, TextureManager& textu
             textureManager.drawFrame(spritesheetId, window, 
                                      srcX, srcY, srcSize, srcSize, 
                                      destX, destY, destSize, destSize);
+            
+            // Dessiner les minéraux et la végétation par-dessus le biome
+            if (cell.material != Material::NONE) {
+                SDL_Rect materialRect;
+                materialRect.x = destX;
+                materialRect.y = destY;
+                materialRect.w = destSize;
+                materialRect.h = destSize;
+                
+                Uint8 r, g, b, a;
+                getMaterialColor(cell.material, r, g, b, a);
+                
+                SDL_Renderer* renderer = &window.getRenderer();
+                SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+                SDL_SetRenderDrawColor(renderer, r, g, b, a);
+                SDL_RenderFillRect(renderer, &materialRect);
+                
+                // Optionnel: ajouter une bordure légère pour mieux distinguer
+                SDL_SetRenderDrawColor(renderer, r / 2, g / 2, b / 2, 200);
+                SDL_RenderDrawRect(renderer, &materialRect);
+            }
         }
     }
 renderSettlements(window, camera, map.getSettlements(), windowWidth, windowHeight);    
 drawRectOnClick(window, map, mouseX, mouseY, camera);
+}
+
+void MapRenderer::getMaterialColor(const Material& material, Uint8& r, Uint8& g, Uint8& b, Uint8& a) const
+{
+    // Définit la couleur pour chaque type de matériau
+    a = 180; // Transparence par défaut
+    
+    switch(material) {
+        // Végétation
+        case Material::GRASS:
+            r = 34; g = 180; b = 65;  // Vert herbe
+            a = 160;
+            break;
+        case Material::MOSS:
+            r = 100; g = 120; b = 60;  // Vert foncé (mousse)
+            a = 140;
+            break;
+        case Material::CACTUS:
+            r = 139; g = 169; b = 19;  // Vert-jaune (cactus)
+            a = 150;
+            break;
+        case Material::PINE_TREE:
+            r = 34; g = 100; b = 40;  // Vert très foncé (pin)
+            a = 170;
+            break;
+        case Material::OAK_TREE:
+            r = 85; g = 140; b = 50;  // Vert moyen (chêne)
+            a = 170;
+            break;
+        case Material::JUNGLE_TREE:
+            r = 0; g = 150; b = 80;  // Vert jungle vif
+            a = 175;
+            break;
+            
+        // Minéraux
+        case Material::BRONZE_ORE:
+            r = 205; g = 127; b = 50;  // Orange-brun (bronze)
+            a = 200;
+            break;
+        case Material::IRON_ORE:
+            r = 100; g = 100; b = 100;  // Gris foncé (fer)
+            a = 210;
+            break;
+        case Material::COAL_ORE:
+            r = 50; g = 50; b = 50;  // Noir (charbon)
+            a = 220;
+            break;
+        case Material::GOLD_ORE:
+            r = 255; g = 215; b = 0;  // Or vif
+            a = 200;
+            break;
+            
+        // Agriculture
+        case Material::WHEAT:
+            r = 218; g = 165; b = 32;  // Doré (blé)
+            a = 160;
+            break;
+            
+        default:
+        case Material::NONE:
+            r = 0; g = 0; b = 0;
+            a = 0;  // Transparent pour NONE
+            break;
+    }
 }
 
 // --- La nouvelle méthode dédiée ---

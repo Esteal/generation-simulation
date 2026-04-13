@@ -14,7 +14,7 @@ MapGenerator::MapGenerator(int seed)
     noiseAltitude.SetFrequency(0.008f);
 
     noiseAltitude.SetFractalType(FastNoiseLite::FractalType_FBm);
-    noiseAltitude.SetFractalOctaves(4);      // 4 couches de détails (crée des micro-vallées)
+    noiseAltitude.SetFractalOctaves(6);      // 4 couches de détails (crée des micro-vallées)
     noiseAltitude.SetFractalLacunarity(2.0f); // La fréquence des petits détails
     noiseAltitude.SetFractalGain(0.25f);
     
@@ -36,7 +36,7 @@ void MapGenerator::setSeed(int newSeed)
     noiseHumidity.SetSeed(newSeed + 2);
 }
 
-void MapGenerator::generate(Map &map)
+/*void MapGenerator::generate(Map &map)
 {  
     
     //std::vector<float> altitudeValues(map.getWidth() * map.getHeight()); 
@@ -81,6 +81,63 @@ void MapGenerator::generate(Map &map)
                 default:
                     // Bruit standard de turbulence pour les autres biomes
                     cell.bedrock += noiseAltitude.GetNoise(fx * 4.0f, fy * 4.0f) * 0.1f;
+                    break;
+            }
+        }
+    }
+}
+*/
+void MapGenerator::generate(Map &map)
+{  
+    for(size_t y = 0; y < map.getHeight(); ++y)
+    {
+        for(size_t x = 0; x < map.getWidth(); ++x)
+        {
+            Cell& cell = map.getGrid().get((float)x, (float)y);
+            float fx = (float)x;
+            float fy = (float)y;
+
+            // 1. LE CONTINENT DE BASE (Collines douces)
+            float baseNoise = (1.0f + noiseAltitude.GetNoise(fx, fy)) / 2.0f;
+
+            // 2. LES MONTAGNES SPECTACULAIRES (Ridged Noise)
+            // On utilise une fréquence un peu plus haute (x2.5) pour les montagnes
+            float mountainNoise = 1.0f - std::abs(noiseAltitude.GetNoise(fx * 2.5f, fy * 2.5f));
+            // L'exponentiation rend les pics acérés et aplatit les bases
+            mountainNoise = std::pow(mountainNoise, 3.0f); 
+
+            // On combine : Les montagnes poussent en fonction de l'altitude de base
+            // (Evite d'avoir des pics géants au fond de l'océan)
+            cell.bedrock = baseNoise + (mountainNoise * baseNoise * 1.5f);
+
+            // 3. CONTRASTE GLOBAL (Aplatit les vallées, élève les sommets)
+            // Ajuste la puissance (1.2f à 2.0f) selon l'agressivité voulue
+            cell.bedrock = std::pow(cell.bedrock, 1.2f);
+
+            // 4. LES CREVASSES ET FAILLES
+            // On utilise un autre bruit (par ex Temperature ou un nouveau) avec une haute fréquence
+            
+
+            // On s'assure que le bedrock reste dans des valeurs gérables pour la suite
+            cell.bedrock = std::max(0.0f, cell.bedrock);
+
+            // --- SUITE DE TON CODE INCHANGÉE ---
+            cell.temperature = (1 + noiseTemperature.GetNoise(fx, fy))/2.0f;
+            cell.humidity = (1 + noiseHumidity.GetNoise(fx, fy))/2.0f;
+            cell.granular = 0.05f; 
+            
+            cell.biome = determineBiome(cell.bedrock, cell.temperature, cell.humidity, cell.granular);
+            
+            // Tu peux garder ton switch pour des retouches cosmétiques (ex: lisser l'océan), 
+            // mais l'essentiel du relief est déjà fait !
+            switch (cell.biome) {
+                case BiomeIndex::DESERT:
+                    cell.bedrock += std::sin(fx * 0.2f + noiseAltitude.GetNoise(fx, fy) * 5.0f) * 0.05f;
+                    break;
+                case BiomeIndex::OCEAN:
+                    cell.bedrock = 0.40f;
+                    break;
+                default:
                     break;
             }
         }

@@ -11,8 +11,8 @@ Chunk::Chunk(int x1, int x2, int y1, int y2, const Map& map)
     int width = x2 - x1 + 1;
     int height = y2 - y1 + 1;
 
-    // 3. CONDITION D'ARRÊT : Si la zone est <= 1x1, on s'arrête (Feuille)
-    if (width <= 1 && height <= 1) {
+    
+    if (width <= 32 && height <= 32) {
         return; 
     }
 
@@ -40,9 +40,9 @@ void Chunk::computeAABB(const Map& map) {
     minPY = 1e9f; maxPY = -1e9f;
 
     // Constantes de rendu (doivent être identiques à celles de ton Renderer)
-    const float tileW = 64.0f; // Taille de la tuile en pixels (doit correspondre à ta spritesheet)
+    const float tileW = 32.0f; // Taille de la tuile en pixels (doit correspondre à ta spritesheet)
     const float tileH = tileW / 2.0f;
-    const float elevationScale = 800.0f;
+    const float elevationScale = 400.0f;
     const float seaLevel = 0.40f;
 
     for (int y = minY; y <= maxY; ++y) {
@@ -53,7 +53,15 @@ void Chunk::computeAABB(const Map& map) {
             
             // Calcul de l'élévation à partir de Map.h
             float alt = map.getAltitude(x, y);
-            float elev = (alt > seaLevel) ? (alt - seaLevel) * elevationScale : 0.0f;
+            float elev; // On déclare la variable d'abord
+
+            if (alt > seaLevel) {
+            // Si la condition est vraie
+                elev = (alt - seaLevel) * elevationScale;
+            } else {
+            // Si la condition est fausse (alt <= seaLevel)
+                elev = 0.0f;
+            }
 
             // On définit les 4 bords visuels de cette tuile précise
             float tileLeft   = isoX;
@@ -71,7 +79,7 @@ void Chunk::computeAABB(const Map& map) {
 }
 
 bool Chunk::isVisible(const Camera2D& camera, float windowWidth, float windowHeight) const {
-    float baseTileW = 64.0f; // Doit être identique à tileW dans computeAABB et au rendu
+    float baseTileW = 32.0f; // Doit être identique à tileW dans computeAABB et au rendu
     float scale = camera.getZoom() / baseTileW;
 
     
@@ -83,7 +91,7 @@ bool Chunk::isVisible(const Camera2D& camera, float windowWidth, float windowHei
 
     float screenMinX = scaledMinPX - camera.getX() + (windowWidth / 2.0f);
     float screenMaxX = scaledMaxPX - camera.getX() + (windowWidth / 2.0f);
-    float screenMinY = scaledMinPY - camera.getY();
+    float screenMinY = scaledMinPY - camera.getY();;
     float screenMaxY = scaledMaxPY - camera.getY();
 
     if (screenMaxX < 0 || screenMinX > windowWidth || screenMaxY < 0 || screenMinY > windowHeight) {
@@ -105,8 +113,8 @@ void Chunk::render(Window& window, TextureManager& tm, const Camera2D& cam,
     if (isLeaf()) {
         float tileW = cam.getZoom();
         float tileH = tileW / 2.0f;
-        float scale = cam.getZoom() / 64.0f; 
-        float elevationScale = 700.0f * scale; 
+        float scale = cam.getZoom() / 32.0f; 
+        float elevationScale = 400.0f * scale; 
         float seaLevel = 0.40f;
         int step = std::max(1, (int)(tileH / 2.0f));
         float offsetX = winW / 2.0f;
@@ -137,7 +145,7 @@ void Chunk::render(Window& window, TextureManager& tm, const Camera2D& cam,
             
             int srcX = 0; 
             int srcY = 0; 
-            int srcSize = 64; 
+            int srcSize = 32; 
             switch (cell.biome) {
                 case BiomeIndex::OCEAN:     srcX = 0 * srcSize; break;
                 case BiomeIndex::GLACE:     srcX = 1 * srcSize; break;
@@ -167,10 +175,11 @@ void Chunk::render(Window& window, TextureManager& tm, const Camera2D& cam,
             }
         }
         
-    } 
+    }else {
     
         if (left) left->render(window, tm, cam, map, spritesheetID, winW, winH);
         if (right) right->render(window, tm, cam, map, spritesheetID, winW, winH);
+    }
     }
 
 

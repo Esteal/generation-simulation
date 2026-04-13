@@ -20,6 +20,7 @@
 #include "system/LightSystem.h"
 #include "system/VegetationSystem.h"
 #include "system/CivilisationSystem.h"
+#include "system/MineralSystem.h"
 
 enum class ViewMode {
         ISOMETRIC,

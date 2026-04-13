@@ -6,7 +6,7 @@
 #ifndef MAP_GENERATOR_H
 #define MAP_GENERATOR_H
 
-#include "Map.h"
+#include "model/Map.h"
 #include "FastNoiseLite.h"
 #include <iostream>
 #include <algorithm>
