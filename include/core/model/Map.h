@@ -8,7 +8,7 @@
 
 #include "Grid.h"
 #include "Cell.h"
-#include "Settlement.h"
+#include "Faction.h"
 
 /**
  * @class Map
@@ -22,7 +22,7 @@ class Map
 private:
     /** @brief Grille 2D contenant toutes les cellules (tuiles) du monde. */
     Grid<Cell> grid;
-    std::vector<Settlement> settlements; /**< Liste de toutes les villes actives sur la carte */
+    std::vector<Faction> factions; /**< Liste de toutes les villes actives sur la carte */
 
 public:
     /**
@@ -68,9 +68,9 @@ public:
     float getAltitude(size_t x, size_t y) const { return grid.get(x, y).bedrock + grid.get(x, y).granular; }
 
 
-    std::vector<Settlement>& getSettlements() { return settlements; }
-    void setSettlements(const std::vector<Settlement>& newSettlements) { settlements = newSettlements; }
-    const std::vector<Settlement>& getSettlements() const { return settlements; }
+    std::vector<Faction>& getFactions() { return factions ;}
+    const std::vector<Faction>& getFactions() const { return factions; }
+    void setFactions(const std::vector<Faction>& newFactions) { factions = newFactions; }
 
     /**
      * @brief Effectue un test de régression pour valider le comportement de la carte.

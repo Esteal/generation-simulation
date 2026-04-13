@@ -1,7 +1,7 @@
 #ifndef CIVILISATIONSYSTEM_H
 #define CIVILISATIONSYSTEM_H
 #include "ISimulationSystem.h"
-#include "Settlement.h"
+#include "Faction.h"
 #include <vector>
 
 class CivilisationSystem : public ISimulationSystem {

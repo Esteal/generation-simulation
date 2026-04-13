@@ -64,7 +64,7 @@ void MapRenderer::render2D(const Map& map, Window& window, TextureManager& textu
             }
         }
     }
-renderSettlements(window, camera, map.getSettlements(), windowWidth, windowHeight);    
+renderFactions(window, camera, map.getFactions(), windowWidth, windowHeight);    
 drawRectOnClick(window, map, mouseX, mouseY, camera);
 }
 
@@ -131,42 +131,44 @@ void MapRenderer::getMaterialColor(const Material& material, Uint8& r, Uint8& g,
             break;
     }
 }
-
-// --- La nouvelle méthode dédiée ---
-void MapRenderer::renderSettlements(Window &window, const Camera2D &camera, 
-                                    const std::vector<Settlement>& settlements,
-                                    const size_t &windowWidth, const size_t &windowHeight)
+void MapRenderer::renderFactions(Window &window, const Camera2D &camera, 
+                                 const std::vector<Faction>& factions,
+                                 const size_t &windowWidth, const size_t &windowHeight)
 {
     SDL_Renderer* renderer = &window.getRenderer();
     int destSize = (int)camera.getZoom();
     float camX = camera.getX();
     float camY = camera.getY();
 
-    for (const auto& settlement : settlements) {
-        int destX = (int)(settlement.x * destSize - camX);
-        int destY = (int)(settlement.y * destSize - camY);
+    for (const Faction& faction : factions) {
+        
+        Uint8 r = (faction.id * 85) % 255;
+        Uint8 g = (faction.id * 140) % 255;
+        Uint8 b = (faction.id * 200) % 255;
 
-        if (destX + destSize < 0 || destX > windowWidth || 
-            destY + destSize < 0 || destY > windowHeight) {
-            continue; 
+        for (const Settlement& settlement : faction.colonies) {
+            
+            int destX = (int)(settlement.x * destSize - camX);
+            int destY = (int)(settlement.y * destSize - camY);
+
+            if (destX + destSize < 0 || destX > windowWidth || 
+                destY + destSize < 0 || destY > windowHeight) {
+                continue; 
+            }
+
+            SDL_Rect cityRect;
+            cityRect.w = destSize / 2;
+            cityRect.h = destSize / 2;
+            cityRect.x = destX + (destSize / 4);
+            cityRect.y = destY + (destSize / 4);
+
+            SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
+            SDL_SetRenderDrawColor(renderer, r, g, b, 255);
+            SDL_RenderFillRect(renderer, &cityRect);
+
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+            SDL_RenderDrawRect(renderer, &cityRect);
         }
-
-        SDL_Rect cityRect;
-        cityRect.w = destSize / 2;
-        cityRect.h = destSize / 2;
-        cityRect.x = destX + (destSize / 4);
-        cityRect.y = destY + (destSize / 4);
-
-        Uint8 r = (settlement.factionId * 85) % 255;
-        Uint8 g = (settlement.factionId * 140) % 255;
-        Uint8 b = (settlement.factionId * 200) % 255;
-
-        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
-        SDL_SetRenderDrawColor(renderer, r, g, b, 255);
-        SDL_RenderFillRect(renderer, &cityRect);
-
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-        SDL_RenderDrawRect(renderer, &cityRect);
     }
 }
 

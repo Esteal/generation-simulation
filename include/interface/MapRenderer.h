@@ -40,7 +40,7 @@ private:
                          const int &mouseX, const int &mouseY,
                          const Camera2D &camera);
     
-    void renderSettlements(Window &window, const Camera2D &camera, const std::vector<Settlement> &settlements,
+    void renderFactions(Window &window, const Camera2D &camera, const std::vector<Faction> &factions,
                             const size_t &windowWidth, const size_t &windowHeight);
     
     /**
