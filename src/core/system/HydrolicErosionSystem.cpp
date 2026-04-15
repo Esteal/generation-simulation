@@ -1,5 +1,4 @@
 #include "HydrolicErosionSystem.h"
-#include <iostream>
 #include <algorithm>
 #include <cmath>
 
@@ -54,7 +53,7 @@ void HydrolicErosionSystem::updateSortedCells(const Map& map)
     });
 }
 
-void HydrolicErosionSystem::calculateDrainage(const Map& map, const vector<CellData>& sortedCells, vector<float>& water, vector<int>& receivers) const 
+void HydrolicErosionSystem::calculateDrainage(const Map& map, const std::vector<CellData>& sortedCells, std::vector<float>& water, std::vector<int>& receivers) const 
 {
     size_t width = map.getWidth();
 
@@ -73,7 +72,7 @@ void HydrolicErosionSystem::calculateDrainage(const Map& map, const vector<CellD
     }
 }
 
-void HydrolicErosionSystem::applyIncision(Map& map, const vector<CellData>& sortedCells, const vector<float>& water, const vector<int>& receivers) const 
+void HydrolicErosionSystem::applyIncision(Map& map, const std::vector<CellData>& sortedCells, const std::vector<float>& water, const std::vector<int>& receivers) const 
 {
     size_t width = map.getWidth();
 
@@ -99,9 +98,9 @@ void HydrolicErosionSystem::applyIncision(Map& map, const vector<CellData>& sort
         float streamPower = K * pow(A, m) * pow(S, n);
 
         float maxErosion = slope * 0.9f;
-        float erodeAmount = min(streamPower, maxErosion);
+        float erodeAmount = std::min(streamPower, maxErosion);
 
-        float granularErosion = min(currentCell.granular, erodeAmount);
+        float granularErosion = std::min(currentCell.granular, erodeAmount);
         currentCell.granular -= granularErosion;
         erodeAmount -= granularErosion;
 

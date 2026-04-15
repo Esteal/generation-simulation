@@ -4,10 +4,8 @@
  */
 #ifndef CAMERA2D_H
 #define CAMERA2D_H
-#include "Window.h"
-#include <algorithm>
 
-using namespace std;
+#include "Window.h"
 
 /**
  * @class Camera2D

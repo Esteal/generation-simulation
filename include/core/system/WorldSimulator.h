@@ -10,8 +10,6 @@
 #include "ISimulationSystem.h"
 #include <vector>
 
-using namespace std;
-
 /**
  * @class WorldSimulator
  * @brief Orchestrateur de la simulation procédurale.
@@ -23,7 +21,7 @@ using namespace std;
 class WorldSimulator {
 private:
     /** @brief Liste des systèmes de simulation à exécuter à chaque mise à jour. */
-    vector<ISimulationSystem*> systems;
+    std::vector<ISimulationSystem*> systems;
     
     /** @brief État de la simulation (en pause ou en cours d'exécution). */
     bool isPaused;

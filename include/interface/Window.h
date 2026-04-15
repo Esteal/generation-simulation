@@ -6,12 +6,9 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include <iostream>
-#include <string>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-
-using namespace std;
+#include <string>
 
 /**
  * @class Window
@@ -40,7 +37,7 @@ public:
      * @param width La largeur de la fenêtre en pixels.
      * @param height La hauteur de la fenêtre en pixels.
      */
-    Window(const string &title, const int &width, const int &height);
+    Window(const std::string &title, const int &width, const int &height);
 
     /**
      * @brief Destructeur de la classe Window.
@@ -71,7 +68,7 @@ public:
      * * @param filePath Le chemin vers le fichier image (ex: "assets/image.png").
      * @return SDL_Texture* Un pointeur vers la texture chargée, ou nullptr en cas d'échec.
      */
-    SDL_Texture* loadTexture(const string& filePath);
+    SDL_Texture* loadTexture(const std::string& filePath);
 
     /**
      * @brief Dessine l'intégralité d'une texture à une position et une taille données sur l'écran.

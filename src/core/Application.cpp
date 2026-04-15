@@ -24,11 +24,20 @@ Application::Application(size_t width, size_t height, size_t mapWidth, size_t ma
     worldSimulator.addSystem(new LightSystem());
     worldSimulator.addSystem(new MineralSystem());
     worldSimulator.addSystem(new VegetationSystem());
-    worldSimulator.addSystem(new CivilisationSystem());
     worldSimulator.update(map, 0.0f);
+
 
     worldSimulator.removeSystem(worldSimulator.getSystem(0)); // Retire l'érosion hydraulique après la phase de génération initiale
     worldSimulator.removeSystem(worldSimulator.getSystem(0)); // Retire l'érosion thermique après la phase de génération initiale
+
+    for(int i = 0; i < 20; ++i)
+        worldSimulator.update(map, 1.0f);
+
+    
+    // algos de simulation qui n'initialise rien, modifie seulement le terrain
+    worldSimulator.addSystem(new CivilisationSystem(map));
+    worldSimulator.addSystem(new AgricultureSystem());
+
     textureManager.load("sprite2D", "spritesheet2D.png", window);
     textureManager.load("sprite2DIso", "spritesheet2DIso.png", window);
 }
@@ -37,7 +46,7 @@ Application::Application(size_t width, size_t height, size_t mapWidth, size_t ma
 void Application::simulate(Uint32 &currentTime, Uint32 &lastUpdateTime)
 {
     currentTime = SDL_GetTicks();
-    if(currentTime - lastUpdateTime >= 1000)
+    if(currentTime - lastUpdateTime >= 100)
     {
         worldSimulator.update(map, 1);
         //generator.setBiome(map);
@@ -56,7 +65,6 @@ void Application::run()
     KeyboardHandler::displayControls();
     while(isRunning)
     {
-        // texturing -> rendering -> affichage    
         KeyboardHandler::keyboardInput(*this);
         window.clear();
         SDL_GetMouseState(&mouseX, &mouseY);

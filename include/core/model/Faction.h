@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <vector>
+#include <map>
 
 /**
  * @struct Settlement
@@ -14,11 +15,25 @@ struct Settlement {
     int population;           /**< Nombre d'habitants actuels */
     int factionId;            /**< Identifiant de la civilisation (pour la couleur/diplomatie) */
     
-    // Potentielles futures variables :
-    // float storedFood;      // Nourriture stockée 
-    // int techLevel;         // Niveau technologique
 };
 
+enum class DiplomaticState : uint8_t {
+    PEACE,
+    WAR
+};
+
+struct FactionRelation {
+    float tension = 0.0f;                       // De 0.0 (Neutre) à 100.0 (Guerre imminente)
+    DiplomaticState state = DiplomaticState::PEACE;
+};
+
+enum class TechLevel : uint8_t
+{
+    UNDEFINED = 0,
+    STONE_AGE,
+    BRONZE_AGE,
+    IRON_AGE
+};
 
 struct Faction {
     int id;
@@ -29,12 +44,21 @@ struct Faction {
     int stockIron = 0;
     int stockCoal = 0;
     int stockGold = 0;
+    int stockWood = 0;
+    int stockFood = 0;
 
+    // --- Expansion et exploitation ---
+    int radiusMigration;
+    int radiusExploitation;
+
+    int capitalX;
+    int capitalY;
     // --- Technologies ---
-    int techLevel = 1;
+    TechLevel techLevel = TechLevel::UNDEFINED;
 
     //
-    std::vector<Settlement> colonies; 
+    std::map<int, FactionRelation> relations;
+    std::vector<Settlement> colonies;
 };
 
 #endif

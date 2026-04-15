@@ -10,9 +10,6 @@
 #include <SDL2/SDL.h>
 #include <string>
 #include <unordered_map>
-#include <iostream>
-
-using namespace std;
 
 /**
  * @class TextureManager
@@ -23,7 +20,7 @@ using namespace std;
  */
 class TextureManager {
 private:
-    unordered_map<string, SDL_Texture*> textures; /**< Dictionnaire associant un identifiant textuel à un pointeur de texture SDL. */
+    std::unordered_map<std::string, SDL_Texture*> textures; /**< Dictionnaire associant un identifiant textuel à un pointeur de texture SDL. */
     
 public:
     /**
@@ -31,7 +28,7 @@ public:
      * @param filePath Le chemin relatif du fichier.
      * @return Le chemin absolu du fichier ou nullptr en cas d'erreur.
      */
-    std::string findPath(const string& filePath);
+    std::string findPath(const std::string& filePath);
 
     /**
      * @brief Constructeur par défaut.
@@ -53,7 +50,7 @@ public:
      * @return true Si la texture a été chargée avec succès ou si elle était déjà en mémoire.
      * @return false Si une erreur est survenue lors du chargement de l'image.
      */
-    bool load(const string& id, const string& filePath, Window& window);
+    bool load(const std::string& id, const std::string& filePath, Window& window);
     
     /**
      * @brief Dessine la texture associée à l'identifiant donné à une position et une taille spécifiées. 
@@ -65,7 +62,7 @@ public:
      * @param w La largeur de la texture à dessiner.
      * @param h La hauteur de la texture à dessiner.
      */
-    void draw(const string& id, Window& window, int x, int y, int w, int h);
+    void draw(const std::string& id, Window& window, int x, int y, int w, int h);
     
     /**
      * @brief Dessine une portion spécifique d'une texture (idéal pour les spritesheets).
@@ -80,7 +77,7 @@ public:
      * @param destW Largeur finale de l'image dessinée à l'écran (permet d'étirer ou de rétrécir).
      * @param destH Hauteur finale de l'image dessinée à l'écran (permet d'étirer ou de rétrécir).
      */
-    void drawFrame(const string& id, Window& window, int srcX, int srcY, int srcW, int srcH, int destX, int destY, int destW, int destH);
+    void drawFrame(const std::string& id, Window& window, int srcX, int srcY, int srcW, int srcH, int destX, int destY, int destW, int destH);
     
     /**
      * @brief Libère toutes les textures chargées en mémoire vidéo et vide le dictionnaire.

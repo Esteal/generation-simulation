@@ -18,8 +18,15 @@ set(COMMON_SOURCES
     src/core/system/VegetationSystem.cpp
     src/core/system/ISimulationSystem.cpp
     src/core/system/LightSystem.cpp
-    src/core/system/CivilisationSystem.cpp
+    src/core/system/AgricultureSystem.cpp
     src/core/system/MineralSystem.cpp
+    src/core/system/civilisation/CivilisationSystem.cpp
+    src/core/system/civilisation/IFactionSystem.cpp
+    src/core/system/civilisation/FoodManager.cpp
+    src/core/system/civilisation/ResourceManager.cpp
+    src/core/system/civilisation/CityManager.cpp
+    src/core/system/civilisation/TechManager.cpp
+    src/core/system/civilisation/WarfareManager.cpp
     src/interface/Window.cpp
     src/interface/TextureManager.cpp
     src/interface/Camera2D.cpp
@@ -39,6 +46,7 @@ target_include_directories(main PRIVATE
     "${CMAKE_SOURCE_DIR}/include/interface"
     "${CMAKE_SOURCE_DIR}/include/core" 
     "${CMAKE_SOURCE_DIR}/include/core/system"
+    "${CMAKE_SOURCE_DIR}/include/core/system/civilisation"
     "${CMAKE_SOURCE_DIR}/include/core/dependencies"
     "${CMAKE_SOURCE_DIR}/include/core/model"
 )
@@ -59,6 +67,7 @@ target_include_directories(run_tests PRIVATE
     "${CMAKE_SOURCE_DIR}/include/interface"
     "${CMAKE_SOURCE_DIR}/include/core" 
     "${CMAKE_SOURCE_DIR}/include/core/system"
+    "${CMAKE_SOURCE_DIR}/include/core/system/civilisation"
     "${CMAKE_SOURCE_DIR}/include/core/dependencies"
     "${CMAKE_SOURCE_DIR}/include/core/model"
 

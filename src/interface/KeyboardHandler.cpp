@@ -41,31 +41,7 @@ void KeyboardHandler::keyboardInput(Application& app)
             }
             else if (events.key.keysym.sym == SDLK_f) 
             {
-                const auto& factions = app.map.getFactions();
-                if (!factions.empty() && !factions.front().colonies.empty()) {
-                        const auto& firstCity = factions.front().colonies.front();
-                        
-                        float worldX = static_cast<float>(firstCity.x);
-                        float worldY = static_cast<float>(firstCity.y);
-                        float zoom = app.camera.getZoom();
-                        float winW = app.width; 
-                        float winH = app.height; 
-                        
-                        float newCamX = 0.0f, newCamY = 0.0f;
-                        
-                        if (app.currentViewMode == ViewMode::ISOMETRIC) {
-                            newCamX = (worldX - worldY) * (zoom / 2.0f);
-                            newCamY = (worldX + worldY) * (zoom / 4.0f) - (winH / 2.0f);
-                        } else {
-                            newCamX = worldX * zoom - (winW / 2.0f);
-                            newCamY = worldY * zoom - (winH / 2.0f);
-                        }
-                        
-                        app.camera.setPosition(newCamX, newCamY);
-                        // std::cout << "Focus camera sur la 1ere ville de la faction " << factions.front().id << std::endl;
-                    } else {
-                        // std::cout << "Aucune ville sur laquelle se focaliser pour le moment." << std::endl;
-                    }
+                focusOnNextCapital(app);
             }
         }
     }
@@ -139,4 +115,35 @@ void KeyboardHandler::switchViewMode(Application& app, bool next) {
     }
 
     app.camera.setPosition(newCamX, newCamY);
+}
+
+void KeyboardHandler::focusOnNextCapital(Application& app)
+{
+    const auto& factions = app.map.getFactions();
+    if (!factions.empty()) {
+        currentFactionIndex = (currentFactionIndex + 1) % factions.size();
+        const auto& currentFaction = factions[currentFactionIndex];
+        
+        if (!currentFaction.colonies.empty()) {
+            
+            float worldX = static_cast<float>(currentFaction.capitalX);
+            float worldY = static_cast<float>(currentFaction.capitalY);
+            
+            float zoom = app.camera.getZoom();
+            float winW = app.width; 
+            float winH = app.height; 
+            
+            float newCamX = 0.0f, newCamY = 0.0f;
+            
+            if (app.currentViewMode == ViewMode::ISOMETRIC) {
+                newCamX = (worldX - worldY) * (zoom / 2.0f);
+                newCamY = (worldX + worldY) * (zoom / 4.0f) - (winH / 2.0f);
+            } else {
+                newCamX = worldX * zoom - (winW / 2.0f);
+                newCamY = worldY * zoom - (winH / 2.0f);
+            }
+
+            app.camera.setPosition(newCamX, newCamY);
+        }
+    }
 }

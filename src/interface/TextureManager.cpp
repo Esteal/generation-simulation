@@ -1,11 +1,12 @@
 #include "TextureManager.h"
+#include <iostream>
 
 TextureManager::~TextureManager() 
 {
     clean();
 }
 
-std::string TextureManager::findPath(const string& filePath) {
+std::string TextureManager::findPath(const std::string& filePath) {
     char* basePath = SDL_GetBasePath();
     std::string imagePath = filePath;
 
@@ -21,11 +22,11 @@ std::string TextureManager::findPath(const string& filePath) {
     }
     return imagePath;
 }
-bool TextureManager::load(const string& id, const string& filePath, Window& window)
+bool TextureManager::load(const std::string& id, const std::string& filePath, Window& window)
 {
     if (textures.find(id) != textures.end()) 
     {
-        cout << "La texture '" << id << "' est deja chargee en memoire." << endl;
+        std::cout << "La texture '" << id << "' est deja chargee en memoire." << std::endl;
         return true; 
     }
 
@@ -36,31 +37,31 @@ bool TextureManager::load(const string& id, const string& filePath, Window& wind
     if (newTexture != nullptr) 
     {
         textures[id] = newTexture;
-        cout << "Texture '" << id << "' chargee avec succes." << endl;
+        std::cout << "Texture '" << id << "' chargee avec succes." << std::endl;
         return true;
     }
     
     return false;
 }
 
-void TextureManager::draw(const string& id, Window& window, int x, int y, int w, int h)
+void TextureManager::draw(const std::string& id, Window& window, int x, int y, int w, int h)
 {
     auto it = textures.find(id);
     
     if (it != textures.end())
         window.drawTexture(it->second, x, y, w, h);
     else
-        cout << "Erreur : Texture '" << id << "' non trouvée." << endl;
+        std::cout << "Erreur : Texture '" << id << "' non trouvée." << std::endl;
 }
 
-void TextureManager::drawFrame(const string& id, Window& window, int srcX, int srcY, int srcW, int srcH, int destX, int destY, int destW, int destH)
+void TextureManager::drawFrame(const std::string& id, Window& window, int srcX, int srcY, int srcW, int srcH, int destX, int destY, int destW, int destH)
 {
     auto it = textures.find(id);
 
     if (it != textures.end())
         window.drawTexture(it->second, srcX, srcY, srcW, srcH, destX, destY, destW, destH);
     else
-        cout << "Erreur : Texture '" << id << "' non trouvée." << endl;
+        std::cout << "Erreur : Texture '" << id << "' non trouvée." << std::endl;
 }
 
 void TextureManager::clean()

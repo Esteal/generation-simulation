@@ -63,6 +63,7 @@ struct Cell
     float pourcentageEvolution = 0.0f;  /**< Pourcentage d'évolution de la cellule, utilisé pour les transitions progressives (ex: désertification, reforestation). */
     Stage stage = Stage::UNDEFINED;     /**< Stade de développement de la cellule */   
     bool isOccupied = false;
+    int faction = 0;                    /**< Si différent de 0 alors signifie la propriété d'une faction */
     BiomeIndex biome;                   /**< Type d'écosystème final assigné à la cellule pour son rendu visuel. */
     Material material = Material::NONE; /**< Type de végétation présente sur la cellule, déterminé par les conditions climatiques. */
 };

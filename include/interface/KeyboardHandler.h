@@ -4,6 +4,10 @@
 class Application;
 
 class KeyboardHandler {
+private:
+    static inline int factionView = 0;
+    static inline int currentFactionIndex = 0;
+    static void focusOnNextCapital(Application& app);
 public:
     /**
      * @brief Gère les événements utilisateurs.

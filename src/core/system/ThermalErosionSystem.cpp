@@ -1,6 +1,4 @@
 #include "ThermalErosionSystem.h"
-#include <iostream>
-#include <algorithm>
 
 void ThermalErosionSystem::process(Map& map, float deltaTime) 
 {
@@ -45,7 +43,7 @@ void ThermalErosionSystem::transferMaterial(Cell& currentCell, Cell& lowestCell,
     float transferAmount = (maxDiff - talusAngle) * friction;
 
     // Les sédiments glissent en premier
-    float granularTransfer = min(currentCell.granular, transferAmount);
+    float granularTransfer = std::min(currentCell.granular, transferAmount);
     currentCell.granular -= granularTransfer;
     lowestCell.granular += granularTransfer;
     

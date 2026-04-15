@@ -14,7 +14,7 @@ void VegetationSystem::process(Map& map, float deltaTime)
 void VegetationSystem::sowASeed(Cell &cell)
 {
 
-    if (cell.biome == BiomeIndex::OCEAN || cell.biome == BiomeIndex::BEACH || cell.biome == BiomeIndex::GLACE || cell.biome == BiomeIndex::RIVER) {
+    if (cell.biome == BiomeIndex::OCEAN || cell.biome == BiomeIndex::GLACE || cell.biome == BiomeIndex::RIVER) {
         return ;
     }
     
@@ -117,32 +117,32 @@ float VegetationSystem::calculateRate(const Material &material, const float &tem
         case Material::MOSS: return std::min({
                 calculateSensivityToVegetation(hum, 0.40f, 0.90f),
                 calculateSensivityToVegetation(light, 0.35f, 0.30f)
-            });
+            }) * 0;
         case Material::CACTUS: return std::min({
                 calculateSensivityToVegetation(temp, 0.20f, 0.85f),
                 calculateSensivityToVegetation(hum, 0.15f, 0.10f),
                 calculateSensivityToVegetation(light, 0.20f, 0.90f),
             });
         case Material::JUNGLE_TREE: return std::min({
-                calculateSensivityToVegetation(temp, 0.7f, 0.3f),
-                calculateSensivityToVegetation(hum, 0.8f, 0.2f),
+                calculateSensivityToVegetation(temp, 0.7f, 0.4f),
+                calculateSensivityToVegetation(hum, 0.8f, 0.3f),
             }) * sediment;
 
         case Material::PINE_TREE: return std::min({
-                calculateSensivityToVegetation(temp, 0.25f, 0.2f),
-                calculateSensivityToVegetation(hum, 0.55f, 0.3f),
+                calculateSensivityToVegetation(temp, 0.25f, 0.3f),
+                calculateSensivityToVegetation(hum, 0.55f, 0.4f),
             }) * sediment;
 
         case Material::OAK_TREE: return std::min({
-                calculateSensivityToVegetation(temp, 0.55f, 0.2f),
-                calculateSensivityToVegetation(hum, 0.70f, 0.3f),
-                calculateSensivityToVegetation(light, 0.60f, 0.4f),
+                calculateSensivityToVegetation(temp, 0.55f, 0.3f),
+                calculateSensivityToVegetation(hum, 0.70f, 0.4f),
+                calculateSensivityToVegetation(light, 0.60f, 0.5f),
             }) * sediment;
 
         case Material::GRASS: return std::min({
                 calculateSensivityToVegetation(temp, 0.40f, 0.50f),
                 calculateSensivityToVegetation(hum, 0.40f, 0.40f),
-            }) * sediment;
+            }) * sediment * 0;
         default: return 0.0f;
     }
 }
@@ -163,6 +163,16 @@ void VegetationSystem::evolveVegetation(Map &map, float deltaTime)
                 continue;
             }
             
+            bool isFlora = (cell.material == Material::MOSS || 
+                            cell.material == Material::CACTUS || 
+                            cell.material == Material::JUNGLE_TREE || 
+                            cell.material == Material::PINE_TREE || 
+                            cell.material == Material::OAK_TREE || 
+                            cell.material == Material::GRASS);
+            
+            if (!isFlora)
+                continue; 
+
             float growthRate = calculateRate(cell.material, cell.temperature, cell.humidity, cell.light, cell.granular);
 
 
@@ -229,6 +239,12 @@ void VegetationSystem::polenization(Map &map, int x, int y, Material material) {
             if(i == x && j == y) continue;
 
             Cell &targetCell = map.getGrid().get(i, j);
+
+
+            if (targetCell.biome == BiomeIndex::OCEAN || targetCell.biome == BiomeIndex::GLACE || targetCell.biome == BiomeIndex::RIVER) {
+                continue ;
+            }
+
             if(targetCell.material == Material::NONE && isSameSpeciesNearby) {
                 float survivalRate = calculateRate(material, targetCell.temperature, targetCell.humidity, targetCell.light, targetCell.granular);
     

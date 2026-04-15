@@ -57,9 +57,17 @@ void MapRenderer::render2D(const Map& map, Window& window, TextureManager& textu
                 SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
                 SDL_SetRenderDrawColor(renderer, r, g, b, a);
                 SDL_RenderFillRect(renderer, &materialRect);
-                
-                // Optionnel: ajouter une bordure légère pour mieux distinguer
-                SDL_SetRenderDrawColor(renderer, r / 2, g / 2, b / 2, 200);
+                                        
+                Uint8 r1 = r / 2;
+                Uint8 g1 = g / 2;
+                Uint8 b1 = b / 2;
+                if(cell.faction != 0)
+                {
+                    r1 = (cell.faction * 85) % 255;
+                    g1 = (cell.faction * 140) % 255;
+                    b1 = (cell.faction * 200) % 255;
+                }
+                SDL_SetRenderDrawColor(renderer, r1, g1, b1, 255);
                 SDL_RenderDrawRect(renderer, &materialRect);
             }
         }
@@ -163,7 +171,22 @@ void MapRenderer::renderFactions(Window &window, const Camera2D &camera,
             cityRect.y = destY + (destSize / 4);
 
             SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
-            SDL_SetRenderDrawColor(renderer, r, g, b, 255);
+            if(settlement.x == faction.capitalX && settlement.y == faction.capitalY) {
+                cityRect.w += 4;
+                cityRect.h += 4;
+                cityRect.x -= 2;
+                cityRect.y -= 2;
+
+                SDL_SetRenderDrawColor(renderer, r, g, b, 255);
+                SDL_RenderFillRect(renderer, &cityRect);
+
+                SDL_Rect coreRect = {cityRect.x + 2, cityRect.y + 2, cityRect.w - 4, cityRect.h - 4};
+                SDL_SetRenderDrawColor(renderer, 255, 215, 0, 255); 
+                SDL_RenderFillRect(renderer, &coreRect);
+            } else {
+                SDL_SetRenderDrawColor(renderer, r, g, b, 255);
+                SDL_RenderFillRect(renderer, &cityRect);
+            }
             SDL_RenderFillRect(renderer, &cityRect);
 
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);

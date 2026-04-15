@@ -12,10 +12,10 @@ private:
     const float DEATH_FACTOR = 0.9;
     std::unordered_map<Material, int> RADIUS = {
         {Material::GRASS, 2},
-        {Material::MOSS, 8},
+        {Material::MOSS, 6},
         {Material::CACTUS, 2},
         {Material::PINE_TREE, 3},
-        {Material::OAK_TREE, 4},
+        {Material::OAK_TREE, 6},
         {Material::JUNGLE_TREE, 5}
      };
     void sowASeed(Cell &cell);

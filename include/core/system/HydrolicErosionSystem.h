@@ -7,9 +7,6 @@
 #define EROSIONSYSTEM_H
 
 #include "ISimulationSystem.h"
-#include <vector>
-
-using namespace std;
 
 /**
  * @struct CellData
@@ -48,9 +45,9 @@ private:
      */
     float n = 1.0f;
 
-    vector<CellData> sortedCells;
-    vector<float> water;
-    vector<int> receivers;
+    std::vector<CellData> sortedCells;
+    std::vector<float> water;
+    std::vector<int> receivers;
 
     /**
      * @brief Met à jour le tableau interne sortedCells sans réallouer de mémoire.

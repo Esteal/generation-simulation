@@ -19,8 +19,9 @@
 #include "system/ThermalErosionSystem.h"
 #include "system/LightSystem.h"
 #include "system/VegetationSystem.h"
-#include "system/CivilisationSystem.h"
+#include "system/civilisation/CivilisationSystem.h"
 #include "system/MineralSystem.h"
+#include "system/AgricultureSystem.h"
 
 enum class ViewMode {
         ISOMETRIC,

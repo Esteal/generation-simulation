@@ -1,22 +1,21 @@
 #include "Window.h"
+#include <iostream>
 
-#include "Window.h"
-
-Window::Window(const string &title, const int &width, const int &height)
+Window::Window(const std::string &title, const int &width, const int &height)
     : window(nullptr), renderer(nullptr), isInitialized(false)
 {
     // Initialisation de SDL
     // cout << "SDL: init" << endl;
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
-        cout << "Erreur lors de l'initialisation de la SDL : " << SDL_GetError() << endl;
+        std::cout << "Erreur lors de l'initialisation de la SDL : " << SDL_GetError() << std::endl;
         return; 
     }
 
     // Initialisation de SDL_image pour les textures png
     int imgFlags = IMG_INIT_PNG;
     if (!(IMG_Init(imgFlags) & imgFlags)) {
-        cout << "Erreur lors de l'initialisation de SDL_image : " << IMG_GetError() << endl;
+        std::cout << "Erreur lors de l'initialisation de SDL_image : " << IMG_GetError() << std::endl;
         SDL_Quit();
         return; 
     }
@@ -25,7 +24,7 @@ Window::Window(const string &title, const int &width, const int &height)
     window = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
     if (window == nullptr)
     {
-        cout << "Erreur lors de la creation de la fenetre : " << SDL_GetError() << endl;
+        std::cout << "Erreur lors de la creation de la fenetre : " << SDL_GetError() << std::endl;
         IMG_Quit();
         SDL_Quit();
         return; 
@@ -34,7 +33,7 @@ Window::Window(const string &title, const int &width, const int &height)
     // Création du renderer
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if (renderer == nullptr) {
-        cout << "Erreur lors de la creation du renderer : " << SDL_GetError() << endl;
+        std::cout << "Erreur lors de la creation du renderer : " << SDL_GetError() << std::endl;
         SDL_DestroyWindow(window);
         IMG_Quit();
         SDL_Quit();
@@ -70,7 +69,7 @@ SDL_Renderer& Window::getRenderer()
     return *renderer;
 }
 
-SDL_Texture* Window::loadTexture(const string& filePath)
+SDL_Texture* Window::loadTexture(const std::string& filePath)
 {
     // créer la Surface en RAM, puis l'envoyer en Texture dans la VRAM.
     

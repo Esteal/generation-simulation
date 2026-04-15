@@ -7,9 +7,6 @@
 #define THERMALEROSIONSYSTEM_H
 
 #include "ISimulationSystem.h"
-#include <vector>
-
-using namespace std;
 
 /**
  * @class ThermalErosionSystem
