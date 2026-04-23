@@ -4,6 +4,186 @@
 
 using json = nlohmann::json;
 
+bool ConfigManager::saveConfig(const std::string& filename, const std::string& directory) {
+    std::vector<std::string> searchPaths = {
+        filename,                                 
+        directory + filename,
+        "../" + directory + filename,             
+        "../../" + directory + filename,          
+        "../../../" + directory + filename        
+    };
+
+    std::ifstream file;
+    std::string loadedPath = "";
+
+    for (const auto& path : searchPaths) {
+        file.open(path);
+        if (file.is_open()) {
+            loadedPath = path;
+            break;
+        }
+    }
+
+    if (!file.is_open()) {
+        std::cerr << "Erreur: Impossible d'ouvrir le fichier de configuration " << filename << std::endl;
+        return false;
+    }
+
+    try {
+        json j;
+
+        j["city_manager"]["cohesion_bonus_per_city"] = currentConfig.cohesionBonusPerCity;
+        j["city_manager"]["penalty_distance_from_mother_city_factor"] = currentConfig.penaltyDistanceFromMotherCityFactor;
+        j["city_manager"]["carrying_capacity_base"] = currentConfig.carryingCapacityBase;
+        j["city_manager"]["min_distance"] = currentConfig.minDistance;
+        j["city_manager"]["number_of_factions"] = currentConfig.numberOfFactions;
+        j["city_manager"]["stock_food"] = currentConfig.stockFood;
+        j["city_manager"]["population_totale"] = currentConfig.populationTotale;
+        j["city_manager"]["default_expand_migration_radius"] = currentConfig.defaultExpandMigrationRadius;
+        j["city_manager"]["default_expand_plant_radius"] = currentConfig.defaultExpandPlantRadius;
+        j["city_manager"]["default_expand_influence_radius"] = currentConfig.defaultExpandInfluenceRadius;
+        j["city_manager"]["tech_base_level"] = static_cast<int>(currentConfig.techBaseLevel);
+
+
+        // --- Warfare Manager ---
+        j["warfare_manager"]["base_casualty_rate"] = currentConfig.baseCasualtyRate;
+        j["warfare_manager"]["combat_range_bonus"] = currentConfig.combatRangeBonus;
+
+        // --- Food Manager ---
+        j["food_manager"]["consumption_rate"] = currentConfig.consumptionRate;
+        j["food_manager"]["replant_chance"] = currentConfig.replantChance;
+        j["food_manager"]["food_harvested"] = currentConfig.foodHarvested;
+
+        // --- Ressource Manager ---
+        j["ressource_manager"]["tree_chop_rate"] = currentConfig.treeChopRate;
+        j["ressource_manager"]["mining_rate"] = currentConfig.miningRate;
+        j["ressource_manager"]["max_wood_per_tree"] = currentConfig.maxWoodPerTree;
+        j["ressource_manager"]["max_ore_per_vein"] = currentConfig.maxOrePerVein;
+
+        // --- Tech Manager ---
+        j["tech_manager"]["cost_wood_bronze"] = currentConfig.costWoodBronze;
+        j["tech_manager"]["req_pop_bronze"] = currentConfig.reqPopBronze;
+        j["tech_manager"]["req_colonies_bronze"] = currentConfig.reqColoniesBronze;
+        j["tech_manager"]["cost_bronze_iron"] = currentConfig.costBronzeIron;
+        j["tech_manager"]["cost_coal_iron"] = currentConfig.costCoalIron;
+        j["tech_manager"]["req_pop_iron"] = currentConfig.reqPopIron;
+        j["tech_manager"]["req_colonies_iron"] = currentConfig.reqColoniesIron;
+
+        // --- Territory System ---
+        j["territory_system"]["tension_factor"] = currentConfig.tensionFactor;
+
+        // --- Thermal Erosion ---
+        j["thermal_erosion"]["talus_angle"] = currentConfig.talusAngle;
+        j["thermal_erosion"]["friction"] = currentConfig.friction;
+        j["thermal_erosion"]["iterations_per_tick"] = currentConfig.iterationsPerTick;
+
+        // --- Hydrolic Erosion ---
+        j["hydrolic_erosion"]["k"] = currentConfig.K;
+        j["hydrolic_erosion"]["m"] = currentConfig.M;
+        j["hydrolic_erosion"]["n"] = currentConfig.n;
+
+        // --- Agriculture ---
+        j["agriculture"]["wheat_growth_speed"] = currentConfig.wheatGrowthSpeed;
+
+        // --- Light ---
+        j["light"]["radius"] = currentConfig.radius;
+        j["light"]["num_directions"] = currentConfig.numDirections;
+
+        // --- Hydrologie ---
+        j["hydrologie"]["river_threshold"] = currentConfig.riverThreshold;
+        j["hydrologie"]["drop_off"] = currentConfig.dropOff;
+
+        // --- Minerals ---
+        j["minerals"]["noise_frequency"] = currentConfig.noiseFrequency;
+        j["minerals"]["base_spawn_chance"] = currentConfig.baseSpawnChance;
+        
+        j["minerals"]["vein_initial_chance"] = currentConfig.veinInitialChance;
+        j["minerals"]["vein_decay_rate"] = currentConfig.veinDecayRate;
+        
+        j["minerals"]["offset_coal"] = currentConfig.offsetCoal;
+        j["minerals"]["offset_iron"] = currentConfig.offsetIron;
+        j["minerals"]["offset_gold"] = currentConfig.offsetGold;
+        j["minerals"]["offset_bronze"] = currentConfig.offsetBronze;
+        
+        j["minerals"]["coal_min_altitude"] = currentConfig.coalMinAltitude;
+        j["minerals"]["coal_max_altitude"] = currentConfig.coalMaxAltitude;
+        j["minerals"]["coal_rarity"] = currentConfig.coalRarity;
+        j["minerals"]["coal_biome_bonus"] = currentConfig.coalBiomeBonus;
+        j["minerals"]["coal_biome_penalty"] = currentConfig.coalBiomePenalty;
+        
+        j["minerals"]["iron_min_altitude"] = currentConfig.ironMinAltitude;
+        j["minerals"]["iron_max_altitude"] = currentConfig.ironMaxAltitude;
+        j["minerals"]["iron_rarity"] = currentConfig.ironRarity;
+        j["minerals"]["iron_biome_bonus"] = currentConfig.ironBiomeBonus;
+        j["minerals"]["iron_biome_penalty"] = currentConfig.ironBiomePenalty;
+        
+        j["minerals"]["gold_min_altitude"] = currentConfig.goldMinAltitude;
+        j["minerals"]["gold_max_altitude"] = currentConfig.goldMaxAltitude;
+        j["minerals"]["gold_rarity"] = currentConfig.goldRarity;
+        j["minerals"]["gold_biome_bonus"] = currentConfig.goldBiomeBonus;
+        j["minerals"]["gold_biome_penalty"] = currentConfig.goldBiomePenalty;
+
+        j["minerals"]["bronze_min_altitude"] = currentConfig.bronzeMinAltitude;
+        j["minerals"]["bronze_max_altitude"] = currentConfig.bronzeMaxAltitude;
+        j["minerals"]["bronze_rarity"] = currentConfig.bronzeRarity;
+        j["minerals"]["bronze_biome_bonus"] = currentConfig.bronzeBiomeBonus;
+        j["minerals"]["bronze_biome_penalty"] = currentConfig.bronzeBiomePenalty;
+
+        // --- Faction Interface ---
+        j["faction_interface"]["soil_bonus_multiplier"] = currentConfig.soilBonusMultiplier;
+        j["faction_interface"]["soil_bonus_max"] = currentConfig.soilBonusMax;
+        j["faction_interface"]["altitude_threshold"] = currentConfig.altitudeThreshold;
+        j["faction_interface"]["altitude_malus_multiplier"] = currentConfig.altitudeMalusMultiplier;
+        j["faction_interface"]["fertility_temperature_weight"] = currentConfig.fertilityTemperatureWeight;
+        j["faction_interface"]["fertility_humidity_weight"] = currentConfig.fertilityHumidityWeight;
+        j["faction_interface"]["fertility_light_weight"] = currentConfig.fertilityLightWeight;
+        j["faction_interface"]["scan_radius"] = currentConfig.scanRadius;
+        j["faction_interface"]["stone_age_water_bonus"] = currentConfig.stoneAgeWaterBonus;
+        j["faction_interface"]["stone_age_wood_bonus"] = currentConfig.stoneAgeWoodBonus;
+        j["faction_interface"]["bronze_age_wood_bonus"] = currentConfig.bronzeAgeWoodBonus;
+        j["faction_interface"]["bronze_age_resource_bonus"] = currentConfig.bronzeAgeResourceBonus;
+        j["faction_interface"]["iron_age_bronze_bonus"] = currentConfig.ironAgeBronzeBonus;
+        j["faction_interface"]["iron_age_resource_bonus"] = currentConfig.ironAgeResourceBonus;
+        j["faction_interface"]["min_migrants"] = currentConfig.minMigrants;
+        j["faction_interface"]["growth_rate"] = currentConfig.growthRate;
+
+        // --- General ---
+        j["general"]["sea_level"] = currentConfig.seaLevel;
+
+        // --- Vegetation ---
+        j["vegetation"]["pollinization_chance"] = currentConfig.pollinizationChance;
+        j["vegetation"]["growth_factor"] = currentConfig.growthFactor;
+        j["vegetation"]["death_factor"] = currentConfig.deathFactor;
+        j["vegetation"]["radius_cactus"] = currentConfig.radiusCactus;
+        j["vegetation"]["radius_pine_tree"] = currentConfig.radiusPineTree;
+        j["vegetation"]["radius_oak_tree"] = currentConfig.radiusOakTree;
+        j["vegetation"]["radius_jungle_tree"] = currentConfig.radiusJungleTree;
+
+        // --- Map Generator ---
+
+        j["map_generator"]["altitude_frequency"] = currentConfig.altitudeFrequency;
+        j["map_generator"]["altitude_octaves"] = currentConfig.altitudeOctaves;
+        j["map_generator"]["altitude_lacunarity"] = currentConfig.altitudeLacunarity;
+        j["map_generator"]["altitude_gain"] = currentConfig.altitudeGain;
+        j["map_generator"]["temperature_frequency"] = currentConfig.temperatureFrequency;
+        j["map_generator"]["humidity_frequency"] = currentConfig.humidityFrequency;
+        j["map_generator"]["granular_frequency"] = currentConfig.granularFrequency;
+
+        std::ofstream outFile(loadedPath);
+        if (!outFile.is_open()) {
+            std::cerr << "Erreur: Impossible d'ouvrir le fichier pour écriture " << loadedPath << std::endl;
+            return false;
+        }
+        outFile << std::setw(4) << j << std::endl; // Indentation pour la lisibilité
+        std::cout << "Configuration sauvegardee avec succes." << std::endl;
+        return true;
+
+    } catch (json::exception& e) {
+        std::cerr << "Erreur lors de la sauvegarde de la configuration : " << e.what() << std::endl;
+        return false;
+    }
+}
+
 bool ConfigManager::loadConfig(const std::string& filename, const std::string& directory) {
     std::vector<std::string> searchPaths = {
         filename,                                 
@@ -77,8 +257,8 @@ bool ConfigManager::loadConfig(const std::string& filename, const std::string& d
             currentConfig.reqColoniesIron = j["tech_manager"].value("req_colonies_iron", 6);
         }
 
-        if(j.contains("tension_factor")) {
-            currentConfig.tensionFactor = j["tension_factor"].value("tension_factor", 5);
+        if(j.contains("territory_system")) {
+            currentConfig.tensionFactor = j["territory_system"].value("tension_factor", 5);
         }
 
         if(j.contains("thermal_erosion")) {
@@ -175,6 +355,16 @@ bool ConfigManager::loadConfig(const std::string& filename, const std::string& d
             currentConfig.radiusPineTree = j["vegetation"].value("radius_pine_tree", 3);
             currentConfig.radiusOakTree = j["vegetation"].value("radius_oak_tree", 6);
             currentConfig.radiusJungleTree = j["vegetation"].value("radius_jungle_tree", 5);
+        }
+
+        if(j.contains("map_generator")) {
+            currentConfig.altitudeFrequency = j["map_generator"].value("altitude_frequency", 0.008f);
+            currentConfig.altitudeOctaves = j["map_generator"].value("altitude_octaves", 6);
+            currentConfig.altitudeLacunarity = j["map_generator"].value("altitude_lacunarity", 2.0f);
+            currentConfig.altitudeGain = j["map_generator"].value("altitude_gain", 0.25f);
+            currentConfig.temperatureFrequency = j["map_generator"].value("temperature_frequency", 0.005f);
+            currentConfig.humidityFrequency = j["map_generator"].value("humidity_frequency", 0.005f);
+            currentConfig.granularFrequency = j["map_generator"].value("granular_frequency", 0.05f);
         }
 
         std::cout << "Configuration chargee avec succes." << std::endl;

@@ -37,6 +37,12 @@ set(COMMON_SOURCES
     src/interface/TextMapRenderer.cpp
     src/interface/KeyboardHandler.cpp
     src/interface/Chunk.cpp
+    src/interface/dependencies/imgui/imgui.cpp
+    src/interface/dependencies/imgui/imgui_draw.cpp
+    src/interface/dependencies/imgui/imgui_widgets.cpp
+    src/interface/dependencies/imgui/imgui_impl_sdl2.cpp
+    src/interface/dependencies/imgui/imgui_impl_sdlrenderer2.cpp
+    src/interface/dependencies/imgui/imgui_tables.cpp
 )
 
 set(COMMON_INCLUDES     
@@ -46,6 +52,7 @@ set(COMMON_INCLUDES
     "${CMAKE_SOURCE_DIR}/include/core/system/civilisation"
     "${CMAKE_SOURCE_DIR}/include/core/dependencies"
     "${CMAKE_SOURCE_DIR}/include/core/model"
+    "${CMAKE_SOURCE_DIR}/include/interface/dependencies/imgui"
 )
 
 # ==========================================

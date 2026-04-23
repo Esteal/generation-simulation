@@ -138,6 +138,15 @@ struct GameConfig {
     int defaultExpandPlantRadius = 2;
     int defaultExpandInfluenceRadius = 4;
     TechLevel techBaseLevel = TechLevel::STONE_AGE;
+
+    // --- Map Generator ---
+    float altitudeFrequency = 0.008f;
+    int altitudeOctaves = 6;
+    float altitudeLacunarity = 2.0f;
+    float altitudeGain = 0.25f;
+    float temperatureFrequency = 0.005f;
+    float humidityFrequency = 0.005f;
+    float granularFrequency = 0.05f;
 };
 
 class ConfigManager {
@@ -154,11 +163,14 @@ public:
         return instance;
     }
 
+
     // Fonction de chargement à appeler au démarrage
-    bool loadConfig(const std::string& filepath, const std::string& directory = "config/");
+    bool loadConfig(const std::string& filename, const std::string& directory = "config/");
 
     // Accès rapide aux données (inline pour la performance)
     const GameConfig& getConfig() const { return currentConfig; }
+    GameConfig& getMutableConfig() { return currentConfig; }
+    bool saveConfig(const std::string& filename, const std::string& directory = "config/");
 };
 
 #endif

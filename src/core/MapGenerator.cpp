@@ -1,31 +1,32 @@
 #include "MapGenerator.h"
+#include "ConfigManager.h"
 
 
 MapGenerator::MapGenerator(int seed)
     : seed(seed)
 {
+    const GameConfig& cfg = ConfigManager::getInstance().getConfig();
+
     noiseAltitude.SetSeed(seed);
     noiseTemperature.SetSeed(seed + 1);
     noiseHumidity.SetSeed(seed + 2);
     noiseGranular.SetSeed(seed + 3);
 
     noiseAltitude.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
-
-    noiseAltitude.SetFrequency(0.008f);
-
+    noiseAltitude.SetFrequency(cfg.altitudeFrequency);
     noiseAltitude.SetFractalType(FastNoiseLite::FractalType_FBm);
-    noiseAltitude.SetFractalOctaves(6);      // 4 couches de détails (crée des micro-vallées)
-    noiseAltitude.SetFractalLacunarity(2.0f); // La fréquence des petits détails
-    noiseAltitude.SetFractalGain(0.25f);
+    noiseAltitude.SetFractalOctaves(cfg.altitudeOctaves);      
+    noiseAltitude.SetFractalLacunarity(cfg.altitudeLacunarity); 
+    noiseAltitude.SetFractalGain(cfg.altitudeGain);
     
     noiseTemperature.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
-    noiseTemperature.SetFrequency(0.005f);
+    noiseTemperature.SetFrequency(cfg.temperatureFrequency);
 
     noiseHumidity.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
-    noiseHumidity.SetFrequency(0.005f);
+    noiseHumidity.SetFrequency(cfg.humidityFrequency);
     
     noiseGranular.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
-    noiseGranular.SetFrequency(0.05f); 
+    noiseGranular.SetFrequency(cfg.granularFrequency);
 }
 
 void MapGenerator::setSeed(int newSeed)
