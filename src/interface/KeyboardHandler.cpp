@@ -53,30 +53,6 @@ void KeyboardHandler::keyboardInput(Application& app)
     if (state[SDL_SCANCODE_LEFT])  app.camera.move(-app.camera.getSpeed(), 0);
     if (state[SDL_SCANCODE_RIGHT]) app.camera.move(app.camera.getSpeed(), 0);
 }
-
-void KeyboardHandler::displayControls() {
-    std::cout << "==========================================" << std::endl;
-    std::cout << "        GUIDE DES COMMANDES - SIM          " << std::endl;
-    std::cout << "==========================================" << std::endl;
-    
-    std::cout << "\n[ DEPLACEMENTS ]" << std::endl;
-    std::cout << "  - Fleches : Deplacer la camera" << std::endl;
-    
-    std::cout << "\n[ ZOOM ]" << std::endl;
-    std::cout << "  - Touche X : Zoom avant (+1.0)" << std::endl;
-    std::cout << "  - Touche C : Zoom arriere (-1.0)" << std::endl;
-    
-    std::cout << "\n[ AFFICHAGE ]" << std::endl;
-    std::cout << "  - Touche B : Mode de vue suivant" << std::endl;
-    std::cout << "  - Touche N : Mode de vue precedent" << std::endl;
-    std::cout << "  - Touche T : Afficher la carte textuelle" << std::endl;
-    
-    std::cout << "\n[ SYSTEME ]" << std::endl;
-    std::cout << "  - Touche P : Pause / Reprise de la simulation" << std::endl;
-    std::cout << "  - ECHAP    : Quitter l'application" << std::endl;
-    
-    std::cout << "------------------------------------------" << std::endl;
-}
 void KeyboardHandler::switchViewMode(Application& app, bool next) {
     float zoom = app.camera.getZoom();
     float camX = app.camera.getX();
@@ -84,7 +60,7 @@ void KeyboardHandler::switchViewMode(Application& app, bool next) {
     
     float winW = app.width; 
     float winH = app.height; 
-
+    
     float worldX = 0.0f, worldY = 0.0f;
 
     if (app.currentViewMode == ViewMode::ISOMETRIC) { 
@@ -147,3 +123,27 @@ void KeyboardHandler::focusOnNextCapital(Application& app)
         }
     }
 }
+    
+    void KeyboardHandler::displayControls() {
+        std::cout << "==========================================" << std::endl;
+        std::cout << "        GUIDE DES COMMANDES - SIM          " << std::endl;
+        std::cout << "==========================================" << std::endl;
+        
+        std::cout << "\n[ DEPLACEMENTS ]" << std::endl;
+        std::cout << "  - Fleches : Deplacer la camera" << std::endl;
+        
+        std::cout << "\n[ ZOOM ]" << std::endl;
+        std::cout << "  - Touche X : Zoom avant (+1.0)" << std::endl;
+        std::cout << "  - Touche C : Zoom arriere (-1.0)" << std::endl;
+        
+        std::cout << "\n[ AFFICHAGE ]" << std::endl;
+        std::cout << "  - Touche B : Mode de vue suivant" << std::endl;
+        std::cout << "  - Touche N : Mode de vue precedent" << std::endl;
+        std::cout << "  - Touche T : Afficher la carte textuelle" << std::endl;
+        
+        std::cout << "\n[ SYSTEME ]" << std::endl;
+        std::cout << "  - Touche P : Pause / Reprise de la simulation" << std::endl;
+        std::cout << "  - ECHAP    : Quitter l'application" << std::endl;
+        
+        std::cout << "------------------------------------------" << std::endl;
+    }

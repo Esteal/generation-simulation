@@ -1,10 +1,19 @@
 #include "FoodManager.h"
 #include <algorithm>
+#include "ConfigManager.h"
 
+FoodManager::FoodManager() {
+    // Charger les paramètres depuis la configuration
+    ConfigManager& cfg = ConfigManager::getInstance();
+    
+    CONSOMMATION_RATE = cfg.getConfig().consumptionRate; 
+    REPLANT_CHANCE = cfg.getConfig().replantChance; 
+    FOOD_HARVESTED = cfg.getConfig().foodHarvested; 
+}
 
 void FoodManager::processFaction(Map &map, Faction &faction, float deltaTime){
 
-        harvestCrops(map, faction);
+        harvestCrops(map, faction, deltaTime);
 
         // consommer
         // ceux qui n'ont pas consommer meurt
@@ -31,14 +40,14 @@ void FoodManager::processFaction(Map &map, Faction &faction, float deltaTime){
         sowSeeds(map, faction, howManySeedToReplant);
 }
 
-void FoodManager::harvestCrops(Map &map, Faction &faction) {
+void FoodManager::harvestCrops(Map &map, Faction &faction, float deltaTime) {
     int width = static_cast<int>(map.getWidth());
     int height = static_cast<int>(map.getHeight());
     int maxRadiusToPlant = faction.radiusExploitation;
 
     std::vector<Candidate> ripeCrops;
 
-    // 1. Repérer toutes les plantations prêtes à être récoltées
+    // Repérer toutes les plantations prêtes à être récoltées
     for (const Settlement& settlement : faction.colonies) {
         for (int dy = -maxRadiusToPlant; dy <= maxRadiusToPlant; ++dy) {
             for (int dx = -maxRadiusToPlant; dx <= maxRadiusToPlant; ++dx) {
@@ -50,6 +59,7 @@ void FoodManager::harvestCrops(Map &map, Faction &faction) {
 
                     if (cell.material == Material::WHEAT && cell.stage == Stage::STAGE_3 && cell.faction == faction.id) {
                         // Utilisation de la distance de Manhattan (plus optimisé que sqrt)
+                        // on essaie de prioriser les recoltes proches de la capitale
                         float dist = abs(nx - faction.capitalX) + abs(ny - faction.capitalY);
                         ripeCrops.push_back({nx, ny, dist});
                     }
@@ -58,21 +68,27 @@ void FoodManager::harvestCrops(Map &map, Faction &faction) {
         }
     }
 
-    // 2. Trier les candidats du plus proche au plus éloigné de la capitale
+    // Trier les candidats du plus proche au plus éloigné de la capitale
     std::sort(ripeCrops.begin(), ripeCrops.end(), [](const Candidate& a, const Candidate& b) {
-        return a.attractivity < b.attractivity; // Tri croissant
+        return a.attractivity < b.attractivity;
     });
 
-    // 3. Récolter dans l'ordre de priorité
+    // Récolter dans l'ordre de priorité
     for (const auto& crop : ripeCrops) {
         Cell& cell = map.getGrid().get(crop.x, crop.y);
         
         // On revérifie l'état de la cellule pour éviter de récolter deux fois la même
         // si les rayons de deux villes se chevauchent.
         if (cell.material == Material::WHEAT && cell.stage == Stage::STAGE_3) {
+
+            if (cell.faction != 0 && cell.faction != faction.id) {
+        
+                faction.relations[cell.faction].tension += 2.0f * deltaTime;                
+                continue; 
+            }
             faction.stockFood += FOOD_HARVESTED;
             
-            // 90% de chance de replanter une nouvelle graine
+            // 90% de chance de replanter une nouvelle graine (si REPLANT_CHANCE n'a pas changé)
             if (static_cast<float>(rand()) / static_cast<float>(RAND_MAX) < REPLANT_CHANCE) {
                 sowSeed(cell, faction.id);
             } else {
@@ -144,5 +160,5 @@ void FoodManager::sowSeed(Cell& targetCell, int factionID)
         targetCell.material = Material::WHEAT;
         targetCell.stage = Stage::STAGE_1;
         targetCell.pourcentageEvolution = 0.0f;
-        targetCell.faction = factionID;
+        //targetCell.faction = factionID;
 }

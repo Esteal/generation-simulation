@@ -1,6 +1,16 @@
 #include "HydrolicErosionSystem.h"
 #include <algorithm>
 #include <cmath>
+#include "ConfigManager.h"
+
+HydrolicErosionSystem::HydrolicErosionSystem() {
+    ConfigManager& cfg = ConfigManager::getInstance();
+    
+    K = cfg.getConfig().K;
+    m = cfg.getConfig().M;
+    n = cfg.getConfig().n;
+    seaLevel = cfg.getConfig().seaLevel;
+}
 
 void HydrolicErosionSystem::process(Map& map, float deltaTime)
 {

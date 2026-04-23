@@ -1,5 +1,6 @@
 #include "Application.h"
 #include "KeyboardHandler.h"
+#include "system/civilisation/TerritorySystem.h"
 #include <iostream>
 #include <Chunk.h>
 
@@ -20,7 +21,7 @@ Application::Application(size_t width, size_t height, size_t mapWidth, size_t ma
     //std::cout << "Application de l'érosion hydraulique..." << std::endl;
     worldSimulator.update(map, 3.0f);
     // algos ayant besoin de temps (deltaTime) à 0 pour s'exécuter une seule fois au lancement
-    worldSimulator.addSystem(new HydrologieSystem(50.0f));
+    worldSimulator.addSystem(new HydrologieSystem());
     worldSimulator.addSystem(new LightSystem());
     worldSimulator.addSystem(new MineralSystem());
     worldSimulator.addSystem(new VegetationSystem());
@@ -35,6 +36,7 @@ Application::Application(size_t width, size_t height, size_t mapWidth, size_t ma
 
     
     // algos de simulation qui n'initialise rien, modifie seulement le terrain
+    worldSimulator.addSystem(new TerritorySystem());
     worldSimulator.addSystem(new CivilisationSystem(map));
     worldSimulator.addSystem(new AgricultureSystem());
 

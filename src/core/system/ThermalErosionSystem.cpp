@@ -1,4 +1,14 @@
 #include "ThermalErosionSystem.h"
+#include "ConfigManager.h"
+
+ThermalErosionSystem::ThermalErosionSystem() {
+    ConfigManager& cfg = ConfigManager::getInstance();
+    
+    talusAngle = cfg.getConfig().talusAngle;
+    friction = cfg.getConfig().friction;
+    iterationsPerTick = cfg.getConfig().iterationsPerTick;
+    seaLevel = cfg.getConfig().seaLevel;
+}
 
 void ThermalErosionSystem::process(Map& map, float deltaTime) 
 {

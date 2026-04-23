@@ -5,19 +5,20 @@
 
 class TechManager : public IFactionSystem {
 private:
-    const int COST_WOOD_BRONZE = 500;
-    const int REQ_POP_BRONZE = 1000;
-    const int REQ_COLONIES_BRONZE = 3;
+    int COST_WOOD_BRONZE;
+    int REQ_POP_BRONZE;
+    int REQ_COLONIES_BRONZE;
 
-    const int COST_BRONZE_IRON = 800;
-    const int COST_COAL_IRON = 1000;
-    const int REQ_POP_IRON = 3000;
-    const int REQ_COLONIES_IRON = 6;
+    int COST_BRONZE_IRON;
+    int COST_COAL_IRON;
+    int REQ_POP_IRON;
+    int REQ_COLONIES_IRON;
 
     void applyTechBonus(Faction& faction);
 
 public:
+    TechManager();
     void processFaction(Map& map, Faction& faction, float deltaTime) override;
 };
 
-#endif // TECH_MANAGER_H
+#endif

@@ -16,8 +16,6 @@
  * également des outils mathématiques et géographiques communs à toutes les simulations.
  */
 class ISimulationSystem {
-protected:
-    const float seaLevel = 0.0f;
 public:
     /**
      * @brief Destructeur virtuel.

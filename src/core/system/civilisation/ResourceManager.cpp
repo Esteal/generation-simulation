@@ -1,5 +1,16 @@
 #include "ResourceManager.h"
 #include <algorithm>
+#include "ConfigManager.h"
+
+ResourceManager::ResourceManager() {
+    // Charger les paramètres depuis la configuration
+    ConfigManager& cfg = ConfigManager::getInstance();
+    
+    TREE_CHOP_RATE = cfg.getConfig().treeChopRate; 
+    MINING_RATE = cfg.getConfig().miningRate;    
+    MAX_WOOD_PER_TREE = cfg.getConfig().maxWoodPerTree; 
+    MAX_ORE_PER_VEIN = cfg.getConfig().maxOrePerVein; 
+}
 
 void ResourceManager::processFaction(Map& map, Faction& faction, float deltaTime) {
     int width = static_cast<int>(map.getWidth());

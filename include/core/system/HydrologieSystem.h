@@ -36,8 +36,8 @@ private:
      * considérée comme une rivière et qu'elle creuse le terrain. 
      */
     float riverThreshold;
-    const float dropoff = 0.1f; /**< Perte d'humidité par case franchie (0.3f équivaut à un rayon max de ~3 cases - 0.1 -> ~10 cases). Plus la valeur est petite, plus l'humidité voyage loin. */
-    const float diagDropoff = dropoff * 1.414f; // Perte en diagonale (racine de 2)
+    float dropoff; /**< Perte d'humidité par case franchie (0.3f équivaut à un rayon max de ~3 cases - 0.1 -> ~10 cases). Plus la valeur est petite, plus l'humidité voyage loin. */
+    float diagDropoff; // Perte en diagonale (racine de 2)
 
     // --- Buffers persistants ---
     std::vector<float> waterMap;
@@ -79,7 +79,7 @@ public:
      * @brief Constructeur du système d'hydrologie.
      * @param riverThreshold Le seuil d'eau requis pour former une rivière (par défaut 40.0f).
      */
-    HydrologieSystem(float riverThreshold = 40.0f);
+    HydrologieSystem();
 
     /**
      * @brief Exécute l'algorithme complet de génération des rivières.

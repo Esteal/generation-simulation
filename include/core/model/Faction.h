@@ -30,9 +30,9 @@ struct FactionRelation {
 enum class TechLevel : uint8_t
 {
     UNDEFINED = 0,
-    STONE_AGE,
-    BRONZE_AGE,
-    IRON_AGE
+    STONE_AGE = 1,
+    BRONZE_AGE = 2,
+    IRON_AGE = 3
 };
 
 struct Faction {
@@ -50,6 +50,7 @@ struct Faction {
     // --- Expansion et exploitation ---
     int radiusMigration;
     int radiusExploitation;
+    int radiusInfluence;
 
     int capitalX;
     int capitalY;

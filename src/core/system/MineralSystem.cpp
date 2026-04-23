@@ -2,8 +2,42 @@
 #include <cstdlib>
 #include <algorithm>
 #include <iostream>
+#include "ConfigManager.h"
+
 
 MineralSystem::MineralSystem() {
+    
+    ConfigManager cfg = ConfigManager::getInstance();
+    
+        OFFSET_COAL   = cfg.getConfig().offsetCoal;
+        OFFSET_IRON   = cfg.getConfig().offsetIron;
+        OFFSET_GOLD   = cfg.getConfig().offsetGold;
+        OFFSET_BRONZE = cfg.getConfig().offsetBronze;
+    
+        COAL_MIN_ALTITUDE = cfg.getConfig().coalMinAltitude;
+        COAL_MAX_ALTITUDE = cfg.getConfig().coalMaxAltitude;
+        COAL_RARITY = cfg.getConfig().coalRarity;
+        COAL_BIOME_BONUS = cfg.getConfig().coalBiomeBonus;
+        COAL_BIOME_PENALTY = cfg.getConfig().coalBiomePenalty;
+    
+        IRON_MIN_ALTITUDE = cfg.getConfig().ironMinAltitude;
+        IRON_MAX_ALTITUDE = cfg.getConfig().ironMaxAltitude;
+        IRON_RARITY = cfg.getConfig().ironRarity;
+        IRON_BIOME_BONUS = cfg.getConfig().ironBiomeBonus;
+        IRON_BIOME_PENALTY = cfg.getConfig().ironBiomePenalty;
+    
+        GOLD_MIN_ALTITUDE = cfg.getConfig().goldMinAltitude;
+        GOLD_MAX_ALTITUDE = cfg.getConfig().goldMaxAltitude;
+        GOLD_RARITY = cfg.getConfig().goldRarity;
+        GOLD_BIOME_BONUS = cfg.getConfig().goldBiomeBonus;
+        GOLD_BIOME_PENALTY = cfg.getConfig().goldBiomePenalty;
+    
+        BRONZE_MIN_ALTITUDE = cfg.getConfig().bronzeMinAltitude;
+        BRONZE_MAX_ALTITUDE = cfg.getConfig().bronzeMaxAltitude;
+        BRONZE_RARITY = cfg.getConfig().bronzeRarity;
+        BRONZE_BIOME_BONUS = cfg.getConfig().bronzeBiomeBonus;
+        BRONZE_BIOME_PENALTY = cfg.getConfig().bronzeBiomePenalty;
+
     noiseGen.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
     noiseGen.SetFrequency(NOISE_FREQUENCY);
 }

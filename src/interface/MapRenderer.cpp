@@ -7,24 +7,23 @@ void MapRenderer::render2D(const Map& map, Window& window, TextureManager& textu
 {
     int destSize = (int) camera.getZoom(); 
     int srcSize = 225;
-
     float camX = camera.getX();
     float camY = camera.getY();
+    SDL_Renderer* renderer = &window.getRenderer();
 
     for (size_t y = 0; y < map.getHeight(); ++y) {
         for (size_t x = 0; x < map.getWidth(); ++x) {
             const Cell& cell = map.getGrid().get(x, y);
             
-            size_t destX = x * destSize - camX;
-            size_t destY = y * destSize - camY;
+            int destX = (int)(x * destSize - camX);
+            int destY = (int)(y * destSize - camY);
 
-            if (destX + destSize < 0 || destX > windowWidth || 
-                destY + destSize < 0 || destY > windowHeight) {
+            if (destX + destSize < 0 || destX > (int)windowWidth || 
+                destY + destSize < 0 || destY > (int)windowHeight) {
                 continue; 
             }
-            int srcX = 0; // colonne de la spritesheet
-            int srcY = 0; // ligne de la spritesheet
-            
+
+            int srcX = 0;
             switch (cell.biome) {
                 case BiomeIndex::OCEAN:     srcX = 0 * srcSize; break;
                 case BiomeIndex::GLACE:     srcX = 1 * srcSize; break;
@@ -37,48 +36,43 @@ void MapRenderer::render2D(const Map& map, Window& window, TextureManager& textu
                 case BiomeIndex::SNOW:      srcX = 6 * srcSize; break;
                 default:                    srcX = 0; break;
             }
-                        
-            textureManager.drawFrame(spritesheetId, window, 
-                                     srcX, srcY, srcSize, srcSize, 
+            textureManager.drawFrame(spritesheetId, window, srcX, 0, srcSize, srcSize, 
                                      destX, destY, destSize, destSize);
-            
-            // Dessiner les minéraux et la végétation par-dessus le biome
-            if (cell.material != Material::NONE) {
-                SDL_Rect materialRect;
-                materialRect.x = destX;
-                materialRect.y = destY;
-                materialRect.w = destSize;
-                materialRect.h = destSize;
+
+            if (cell.faction != 0) {
+                SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
                 
+                Uint8 r = (cell.faction * 85) % 255;
+                Uint8 g = (cell.faction * 140) % 255;
+                Uint8 b = (cell.faction * 200) % 255;
+
+                SDL_SetRenderDrawColor(renderer, r, g, b, 150); 
+                SDL_Rect territoryRect = { destX, destY, destSize, destSize };
+                SDL_RenderFillRect(renderer, &territoryRect);
+
+            }
+            
+            if (cell.material != Material::NONE && camera.getZoom() >= 20) {
+                SDL_Rect materialRect = { destX + 2, destY + 2, destSize - 4, destSize - 4 };
                 Uint8 r, g, b, a;
                 getMaterialColor(cell.material, r, g, b, a);
                 
-                SDL_Renderer* renderer = &window.getRenderer();
                 SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
                 SDL_SetRenderDrawColor(renderer, r, g, b, a);
                 SDL_RenderFillRect(renderer, &materialRect);
-                                        
-                Uint8 r1 = r / 2;
-                Uint8 g1 = g / 2;
-                Uint8 b1 = b / 2;
-                if(cell.faction != 0)
-                {
-                    r1 = (cell.faction * 85) % 255;
-                    g1 = (cell.faction * 140) % 255;
-                    b1 = (cell.faction * 200) % 255;
-                }
-                SDL_SetRenderDrawColor(renderer, r1, g1, b1, 255);
+
+                SDL_SetRenderDrawColor(renderer, r/2, g/2, b/2, 200);
                 SDL_RenderDrawRect(renderer, &materialRect);
             }
         }
     }
-renderFactions(window, camera, map.getFactions(), windowWidth, windowHeight);    
-drawRectOnClick(window, map, mouseX, mouseY, camera);
+
+    renderFactions(window, camera, map.getFactions(), windowWidth, windowHeight);    
+    drawRectOnClick(window, map, mouseX, mouseY, camera);
 }
 
 void MapRenderer::getMaterialColor(const Material& material, Uint8& r, Uint8& g, Uint8& b, Uint8& a) const
 {
-    // Définit la couleur pour chaque type de matériau
     a = 180; // Transparence par défaut
     
     switch(material) {
@@ -159,8 +153,8 @@ void MapRenderer::renderFactions(Window &window, const Camera2D &camera,
             int destX = (int)(settlement.x * destSize - camX);
             int destY = (int)(settlement.y * destSize - camY);
 
-            if (destX + destSize < 0 || destX > windowWidth || 
-                destY + destSize < 0 || destY > windowHeight) {
+            if (destX + destSize < 0 || destX > static_cast<int>(windowWidth) || 
+                destY + destSize < 0 || destY > static_cast<int>(windowHeight)) {
                 continue; 
             }
 
@@ -171,7 +165,7 @@ void MapRenderer::renderFactions(Window &window, const Camera2D &camera,
             cityRect.y = destY + (destSize / 4);
 
             SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
-            if(settlement.x == faction.capitalX && settlement.y == faction.capitalY) {
+            if(static_cast<int>(settlement.x) == faction.capitalX && static_cast<int>(settlement.y) == faction.capitalY) {
                 cityRect.w += 4;
                 cityRect.h += 4;
                 cityRect.x -= 2;

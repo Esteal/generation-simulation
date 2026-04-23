@@ -5,14 +5,15 @@
 class ResourceManager : public IFactionSystem {
 private:
     // La vitesse à laquelle la ressource est prélevée (ex: 0.2 = 20% par itération)
-    const float TREE_CHOP_RATE = 0.5f; 
-    const float MINING_RATE = 0.2f;    
+    float TREE_CHOP_RATE; 
+    float MINING_RATE;    
 
     // La quantité de ressource brute que contient une case pleine à 100% (1.0f)
-    const float MAX_WOOD_PER_TREE = 50.0f;
-    const float MAX_ORE_PER_VEIN = 300.0f;
+    float MAX_WOOD_PER_TREE;
+    float MAX_ORE_PER_VEIN;
 
 public:
+    ResourceManager();
     void processFaction(Map& map, Faction& faction, float deltaTime) override;
 };
 #endif

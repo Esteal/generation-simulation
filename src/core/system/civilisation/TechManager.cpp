@@ -1,11 +1,24 @@
 #include "TechManager.h"
+#include "ConfigManager.h"
+
+TechManager::TechManager() {
+    ConfigManager& cfg = ConfigManager::getInstance();
+    
+    COST_WOOD_BRONZE = cfg.getConfig().costWoodBronze;
+    REQ_POP_BRONZE = cfg.getConfig().reqPopBronze;
+    REQ_COLONIES_BRONZE = cfg.getConfig().reqColoniesBronze;
+    COST_BRONZE_IRON = cfg.getConfig().costBronzeIron;
+    COST_COAL_IRON = cfg.getConfig().costCoalIron;
+    REQ_POP_IRON = cfg.getConfig().reqPopIron;
+    REQ_COLONIES_IRON = cfg.getConfig().reqColoniesIron;
+}
 
 void TechManager::processFaction(Map& map, Faction& faction, float deltaTime) {
-    
+    const int numberOfColonies = static_cast<int>(faction.colonies.size());
     if (faction.techLevel == TechLevel::STONE_AGE) {
         
         if (faction.populationTotale >= REQ_POP_BRONZE && 
-            faction.colonies.size() >= REQ_COLONIES_BRONZE && 
+            numberOfColonies >= REQ_COLONIES_BRONZE && 
             faction.stockWood >= COST_WOOD_BRONZE) 
         {
             faction.stockWood -= COST_WOOD_BRONZE;
@@ -19,7 +32,7 @@ void TechManager::processFaction(Map& map, Faction& faction, float deltaTime) {
     else if (faction.techLevel == TechLevel::BRONZE_AGE) {
         
         if (faction.populationTotale >= REQ_POP_IRON && 
-            faction.colonies.size() >= REQ_COLONIES_IRON && 
+            numberOfColonies >= REQ_COLONIES_IRON && 
             faction.stockBronze >= COST_BRONZE_IRON &&
             faction.stockCoal >= COST_COAL_IRON) 
         {

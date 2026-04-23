@@ -21,7 +21,7 @@ struct CellData {
 };
 
 /**
- * @class ErosionSystem
+ * @class HydrolicErosionSystem
  * @brief Système de simulation de l'érosion hydraulique par puissance de flux (Stream Power Erosion).
  * * Cette classe simule l'action de l'eau de pluie qui s'accumule pour former des cours d'eau,
  * creusant des vallées et des lits de rivières en fonction de la pente et du volume d'eau.
@@ -33,17 +33,19 @@ private:
     /** * @brief Puissance de base de l'érosion (Constante K). 
      * Détermine la quantité globale de matière arrachée à chaque itération. 
      */
-    float K = 0.1f;         
+    float K;         
 
     /** * @brief Influence de l'accumulation d'eau (Exposant m). 
      * Gère l'avantage géologique des grands fleuves par rapport aux petits ruisseaux. 
      */
-    float m = 0.5f;         
+    float m;         
 
     /** * @brief Influence de la pente (Exposant n). 
      * Définit à quel point la verticalité du terrain accélère le processus d'érosion. 
      */
-    float n = 1.0f;
+    float n;
+
+    float seaLevel;    // Niveau de la mer, en dessous duquel aucune érosion ne se produit
 
     std::vector<CellData> sortedCells;
     std::vector<float> water;
@@ -82,6 +84,8 @@ public:
      * @param deltaTime Le multiplicateur de temps ou nombre d'itérations à effectuer durant ce cycle.
      */
     void process(Map& map, float deltaTime) override;
+
+    HydrolicErosionSystem();
 
     /**
      * @brief Effectue un test de régression pour valider le comportement de la carte.

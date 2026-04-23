@@ -9,8 +9,7 @@ private:
     int numDirections;
 
 public:
-    LightSystem(int radius = 10, int numDirections = 8) 
-        : radius(radius), numDirections(numDirections) {}
+    LightSystem();
 
     void process(Map& map, float deltaTime) override;
 };

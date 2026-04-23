@@ -21,20 +21,21 @@ private:
      * Tolérance maximale de la roche à la verticalité. Si la différence d'altitude 
      * entre deux cellules dépasse ce seuil, un éboulement se déclenche.
      */
-    float talusAngle = 0.005f; 
+    float talusAngle; 
 
     /** * @brief Viscosité ou vitesse de glissement de la matière. 
      * Détermine la proportion de matière instable qui s'effondre en une seule itération.
      * Une valeur de 0.5 offre un bon compromis pour un glissement fluide.
      */
-    float friction = 0.5f;     
+    float friction;     
 
     /** * @brief Fréquence d'exécution locale. 
      * Nombre d'itérations de gravité effectuées pour chaque appel au système. 
      * Assure que les éboulements ont le temps de cascader jusqu'au bas des montagnes.
      */
-    int iterationsPerTick = 3; 
+    int iterationsPerTick; 
 
+    float seaLevel;
     /**
      * @brief Analyse une cellule spécifique et déclenche un éboulement si nécessaire.
      * * Recherche le voisin le plus bas. Si la pente vers ce voisin dépasse \p talusAngle,
@@ -57,6 +58,8 @@ private:
     void transferMaterial(Cell& currentCell, Cell& lowestCell, float maxDiff) const;
 
 public:
+    ThermalErosionSystem();
+
     /**
      * @brief Exécute l'érosion thermique sur l'ensemble de la carte.
      * * Parcourt toutes les cellules de la carte pour appliquer les règles de gravité.

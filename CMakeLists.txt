@@ -9,6 +9,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin")
 # 2. Sources communes (SANS main.cpp ni test_main.cpp)
 set(COMMON_SOURCES
     src/core/Application.cpp
+    src/core/ConfigManager.cpp
     src/core/model/Map.cpp
     src/core/MapGenerator.cpp
     src/core/system/HydrologieSystem.cpp
@@ -21,6 +22,7 @@ set(COMMON_SOURCES
     src/core/system/AgricultureSystem.cpp
     src/core/system/MineralSystem.cpp
     src/core/system/civilisation/CivilisationSystem.cpp
+    src/core/system/civilisation/TerritorySystem.cpp
     src/core/system/civilisation/IFactionSystem.cpp
     src/core/system/civilisation/FoodManager.cpp
     src/core/system/civilisation/ResourceManager.cpp
@@ -37,12 +39,7 @@ set(COMMON_SOURCES
     src/interface/Chunk.cpp
 )
 
-# ==========================================
-# CIBLE 1 : L'application principale
-# ==========================================
-add_executable(main src/main.cpp ${COMMON_SOURCES})
-
-target_include_directories(main PRIVATE 
+set(COMMON_INCLUDES     
     "${CMAKE_SOURCE_DIR}/include/interface"
     "${CMAKE_SOURCE_DIR}/include/core" 
     "${CMAKE_SOURCE_DIR}/include/core/system"
@@ -50,6 +47,12 @@ target_include_directories(main PRIVATE
     "${CMAKE_SOURCE_DIR}/include/core/dependencies"
     "${CMAKE_SOURCE_DIR}/include/core/model"
 )
+
+# ==========================================
+# CIBLE 1 : L'application principale
+# ==========================================
+add_executable(main src/main.cpp ${COMMON_SOURCES})
+target_include_directories(main PRIVATE ${COMMON_INCLUDES})
 
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
@@ -61,17 +64,7 @@ target_link_libraries(main PRIVATE SDL2::SDL2 SDL2_image::SDL2_image)
 # ==========================================
 # On compile les mêmes sources communes, mais avec test_main.cpp
 add_executable(run_tests src/testRegression.cpp ${COMMON_SOURCES})
-
-# Inclusion des mêmes dossiers (header)
-target_include_directories(run_tests PRIVATE 
-    "${CMAKE_SOURCE_DIR}/include/interface"
-    "${CMAKE_SOURCE_DIR}/include/core" 
-    "${CMAKE_SOURCE_DIR}/include/core/system"
-    "${CMAKE_SOURCE_DIR}/include/core/system/civilisation"
-    "${CMAKE_SOURCE_DIR}/include/core/dependencies"
-    "${CMAKE_SOURCE_DIR}/include/core/model"
-
-)
+target_include_directories(run_tests PRIVATE ${COMMON_INCLUDES})
 
 # On ajoute le flag "DEBUG_TESTS" UNIQUEMENT pour cet exécutable
 target_compile_definitions(run_tests PRIVATE DEBUG_TESTS)

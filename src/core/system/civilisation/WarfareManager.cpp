@@ -1,7 +1,18 @@
 #include "WarfareManager.h"
+#include "ConfigManager.h"
 #include <cmath>
 #include <iostream>
 #include <map>
+
+WarfareManager::WarfareManager()
+{
+
+    const GameConfig& cfg = ConfigManager::getInstance().getConfig();
+    BASE_CASUALTY_RATE = cfg.baseCasualtyRate;
+    COMBAT_RANGE_BONUS = cfg.combatRangeBonus;
+
+    std::cout << "BASE_CASUALTY_RATE" << BASE_CASUALTY_RATE << "\nCOMBAT_RANGE_BONUS : " << COMBAT_RANGE_BONUS << std::endl;
+}
 
 float WarfareManager::getTechMultiplier(TechLevel techLevel) const {
     switch (techLevel) {
@@ -21,9 +32,7 @@ void WarfareManager::processFaction(Map& map, Faction& faction, float deltaTime)
     int totalMyCasualties = 0;
     std::map<int, int> enemyCasualtiesMap; // Clé = ID Faction Ennemie, Valeur = Pertes
 
-    // =========================================================
-    // PHASE 1 : ANALYSE ET CALCUL DES PERTES (Aucune modification)
-    // =========================================================
+    // --- ANALYSE ET CALCUL DES PERTES (Aucune modification) ---
     for (const Settlement& myCity : faction.colonies) {
         
         for (auto& [enemyId, relation] : faction.relations) {
@@ -47,7 +56,7 @@ void WarfareManager::processFaction(Map& map, Faction& faction, float deltaTime)
 
                     if (dist <= combatRange) {
                         
-                        // Calcul de la puissance militaire (Population * Bonus Tech)
+                        // Calcul de la puissance militaire (Population * Bonus Tech), à voir plus tard avec différents type d'évolution pour le TechBonus
                         float myPower = myCity.population * getTechMultiplier(faction.techLevel);
                         float enemyPower = enemyCity.population * getTechMultiplier(enemyFaction->techLevel);
 
@@ -67,23 +76,19 @@ void WarfareManager::processFaction(Map& map, Faction& faction, float deltaTime)
         }
     }
 
-    // =========================================================
-    // PHASE 2 : RESOLUTION (Utilisation de l'Interface)
-    // =========================================================
+    // --- APPLIQUATION DES PERTEZ ---
     
-    // 1. Appliquer les pertes à notre propre faction
+    // Nos pertes
     if (totalMyCasualties > 0) {
+        // TODO : Pour l'instant on ne voit pas la faction qui nous as tué
         killPopulation(map, faction, totalMyCasualties);
     }
 
-    // 2. Appliquer les pertes aux factions ennemies
+    // Appliquer les pertes aux factions ennemies
     for (auto& [enemyId, totalCasualties] : enemyCasualtiesMap) {
         if (totalCasualties > 0) {
-            // On doit retrouver la faction ennemie par référence pour la modifier
             for (Faction& enemyFaction : allFactions) {
                 if (enemyFaction.id == enemyId) {
-                    
-                    // Appel de la méthode de l'interface IFactionSystem
                     killPopulation(map, enemyFaction, totalCasualties, &faction);
                     break;
                 }

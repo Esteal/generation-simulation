@@ -1,4 +1,28 @@
 #include "IFactionSystem.h"
+#include "ConfigManager.h"
+
+IFactionSystem::IFactionSystem() {
+    // Initialize static constants
+    const GameConfig& cfg = ConfigManager::getInstance().getConfig();
+
+    MIN_MIGRANTS = cfg.minMigrants;
+    GROWTH_RATE = cfg.growthRate;
+    
+    SOIL_BONUS_MULTIPLIER = cfg.soilBonusMultiplier;
+    SOIL_BONUS_MAX = cfg.soilBonusMax;
+    ALTITUDE_THRESHOLD = cfg.altitudeThreshold;
+    ALTITUDE_MALUS_MULTIPLIER = cfg.altitudeMalusMultiplier;
+    FERTILITY_TEMPERATURE_WEIGHT = cfg.fertilityTemperatureWeight;
+    FERTILITY_HUMIDITY_WEIGHT = cfg.fertilityHumidityWeight;
+    FERTILITY_LIGHT_WEIGHT = cfg.fertilityLightWeight;
+    SCAN_RADIUS = cfg.scanRadius;
+    STONE_AGE_WATER_BONUS = cfg.stoneAgeWaterBonus;
+    STONE_AGE_WOOD_BONUS = cfg.stoneAgeWoodBonus;
+    BRONZE_AGE_WOOD_BONUS = cfg.bronzeAgeWoodBonus;
+    BRONZE_AGE_RESOURCE_BONUS = cfg.bronzeAgeResourceBonus;
+    IRON_AGE_BRONZE_BONUS = cfg.ironAgeBronzeBonus;
+    IRON_AGE_RESOURCE_BONUS = cfg.ironAgeResourceBonus;
+}
 
 void IFactionSystem::resetCell(Cell& cell) {
     cell.material = Material::NONE;
@@ -96,6 +120,7 @@ float IFactionSystem::calculateTechAttractivity(const Map& map, int cx, int cy, 
     */
     // On laisse le score dépasser 1.0f. Ainsi, une case moyennement fertile (0.6) 
     // mais entourée de fer (bonus 0.6) aura 1.2 et battra une prairie vide (1.0).
+    // Dans la logique, après à voir les tests de regressions
     return finalScore; 
 }
 
@@ -153,7 +178,7 @@ void IFactionSystem::killPopulation(Map& map, Faction& faction, int totalDeaths,
                   //        << " a perdu la ville en " << it->x << " / " << it->y 
                     //      << " par manque de ressources ou usure." << std::endl;
                 
-                // Destruction simple
+                // Destruction simple (mort de fin uniquement pour l'instant, à voir plus tard si manque de ressource)
                 map.getGrid().get(it->x, it->y).isOccupied = false;
                 map.getGrid().get(it->x, it->y).faction = 0;
             }
@@ -171,20 +196,20 @@ void IFactionSystem::killPopulation(Map& map, Faction& faction, int totalDeaths,
 
     // --- GESTION DE LA CAPITALE ET DE L'EMPIRE ---
     
-    // Cas A : La capitale a été conquise
+    // La capitale a été conquise
     if (capitalConquered && conqueror != nullptr) {
         std::cout << "👑 CHUTE DE L'EMPIRE : La capitale de la faction " << faction.id 
                   << " est tombee ! Toutes ses colonies se rendent a la faction " << conqueror->id << " !" << std::endl;
         
-        // Toutes les villes restantes se soumettent
+        // Toutes les villes restantes changentt de faction
         for (auto& remainingCity : faction.colonies) {
             remainingCity.factionId = conqueror->id;
             conqueror->colonies.push_back(remainingCity);
             map.getGrid().get(remainingCity.x, remainingCity.y).faction = conqueror->id;
         }
-        faction.colonies.clear(); // La faction vaincue n'a plus aucune ville
+        faction.colonies.clear(); // La faction vaincue n'a plus aucune ville (la supression de la faction se fait dans la classe CivilisationManager)
     } 
-    // Cas B : Famine, ou ville mineure détruite (l'empire survit s'il reste des villes)
+    // Famine, ou ville mineure détruite (la faction survit s'il reste des villes)
     else if (!faction.colonies.empty()) {
         
         bool capitalExists = false;

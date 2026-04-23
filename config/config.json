@@ -1,0 +1,131 @@
+{
+  "general" : {
+    "sea_level": 0.0
+  },
+  "vegetation" : {
+    "pollinization_chance": 0.1,
+    "growth_factor": 0.5,
+    "death_factor": 0.9,
+    "radius_cactus": 2,
+    "radius_pine_tree": 3,
+    "radius_oak_tree": 6,
+    "radius_jungle_tree": 5
+  },
+  "minerals" : {
+    "noise_frequency": 0.05,
+    "base_spawn_chance": 0.05,
+    
+    "vein_initial_chance": 0.60,
+    "vein_decay_rate": 0.20,
+    
+    "offset_coal": 0.0,
+    "offset_iron": 10000.0,
+    "offset_gold": 20000.0,
+    "offset_bronze": 30000.0,
+    
+    "coal_min_altitude": 0.3,
+    "coal_max_altitude": 0.7,
+    "coal_rarity": 0.4,
+    "coal_biome_bonus": 1.5,
+    "coal_biome_penalty": 0.5,
+    
+    "iron_min_altitude": 0.5,
+    "iron_max_altitude": 0.9,
+    "iron_rarity": 0.2,
+    "iron_biome_bonus": 2.0,
+    "iron_biome_penalty": 0.8,
+    
+    "gold_min_altitude": 0.2,
+    "gold_max_altitude": 0.5,
+    "gold_rarity": 0.15,
+    "gold_biome_bonus": 1.2,
+    "gold_biome_penalty": 0.5,
+    
+    "bronze_min_altitude": 0.25,
+    "bronze_max_altitude": 0.65,
+    "bronze_rarity": 0.45,
+    "bronze_biome_bonus": 1.8,
+    "bronze_biome_penalty": 0.6
+
+  },
+  "light": {
+    "radius" : 10,
+    "num_directions" : 8
+  },
+  "hydrologie" : {
+    "river_threshold": 50,
+    "drop_off": 0.1
+  },
+  "thermal_erosion" : {
+    "talus_angle": 0.005,
+    "friction": 0.5,
+    "iterations_per_tick": 3
+  },
+  "hydrolic_erosion" : {
+    "k": 0.1,
+    "m": 0.5,
+    "n": 1.0
+  },
+  "agriculture": {
+    "wheat_growth_speed": 0.3
+  },
+
+  "faction_interface" :{    
+    "soil_bonus_multiplier": 0.8,
+    "soil_bonus_max": 0.40,
+    "altitude_threshold": 1.2,
+    "altitude_malus_multiplier": 0.3,
+    "fertility_temperature_weight": 0.25,
+    "fertility_humidity_weight": 0.35,
+    "fertility_light_weight": 0.10,
+    "scan_radius": 2,
+    "stone_age_water_bonus": 0.10,
+    "stone_age_wood_bonus": 0.15,
+    "bronze_age_wood_bonus": 0.05,
+    "bronze_age_resource_bonus": 0.25,
+    "iron_age_bronze_bonus": 0.10,
+    "iron_age_resource_bonus": 0.30,
+    "min_migrants": 50,
+    "growth_rate": 0.1
+  },
+  "city_manager": {
+    "carrying_capacity_base": 600,
+    "cohesion_bonus_per_city": 1.0,
+    "penalty_distance_from_mother_city_factor": 0.15,
+    "min_distance": 20,               
+    "number_of_factions": 15,
+    "stock_food": 300,                     
+    "population_totale": 100, 
+    "default_expand_migration_radius": 3,
+    "default_expand_plant_radius": 2,
+    "default_expand_influence_radius": 4,
+    "tech_base_level": 1
+  },
+  "warfare_manager": {
+    "base_casualty_rate": 0.2,
+    "combat_range_bonus": 1
+  },
+  "food_manager": {
+    "consommation_rate": 0.8,
+    "replant_chance": 0.8,
+    "food_harvested": 100
+  },
+  "ressource_manager": {
+    "tree_chop_rate": 0.5,
+    "mining_rate": 0.2,
+    "max_wood_per_tree": 50.0,
+    "max_ore_per_vein": 300.0
+  },
+  "tech_manager": {
+    "cost_wood_bronze": 500,
+    "req_pop_bronze": 1000,
+    "req_colonies_bronze": 3,
+    "cost_bronze_iron": 800,
+    "cost_coal_iron": 1000,
+    "req_pop_iron": 3000,
+    "req_colonies_iron": 6
+  },
+  "territory_system": {
+    "tension_factor": 5
+  }
+}

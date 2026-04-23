@@ -1,8 +1,13 @@
 #include "system/HydrologieSystem.h"
 #include <algorithm>
+#include "ConfigManager.h"
 
-HydrologieSystem::HydrologieSystem(float riverThreshold) 
-    : riverThreshold(riverThreshold) {}
+HydrologieSystem::HydrologieSystem() {
+    ConfigManager& cfg = ConfigManager::getInstance();
+    riverThreshold = cfg.getConfig().riverThreshold;
+    dropoff = cfg.getConfig().dropOff;
+    diagDropoff = dropoff * 1.414f; 
+}
 
 void HydrologieSystem::process(Map& map, float deltaTime) 
 {
@@ -204,7 +209,7 @@ bool HydrologieSystem::testRegression() {
     BiomeIndex biomeAvant = m.getGrid().get(1, 1).biome;
     m.getGrid().get(0, 1).biome = BiomeIndex::OCEAN;
 
-    HydrologieSystem sys(2.0f);
+    HydrologieSystem sys;
     sys.process(m, 0.0f);
     
     BiomeIndex biomeApres = m.getGrid().get(1, 1).biome;

@@ -1,6 +1,13 @@
 #include "LightSystem.h"
 #include <cmath>
 #include <algorithm>
+#include "ConfigManager.h"
+
+LightSystem::LightSystem() {
+    ConfigManager& cfg = ConfigManager::getInstance();
+    radius = cfg.getConfig().radius;
+    numDirections = cfg.getConfig().numDirections;
+}
 
 void LightSystem::process(Map& map, float deltaTime) {
 

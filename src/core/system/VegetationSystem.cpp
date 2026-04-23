@@ -1,7 +1,37 @@
 #include "VegetationSystem.h"
 #include <cmath>
 #include <algorithm>
-#include <cstdlib>   
+#include "ConfigManager.h"
+
+VegetationSystem::VegetationSystem() {
+
+    ConfigManager& cfg = ConfigManager::getInstance();
+    
+    POLINIZATION_CHANCE = cfg.getConfig().pollinizationChance;
+    GROWTH_FACTOR = cfg.getConfig().growthFactor;
+    DEATH_FACTOR = cfg.getConfig().deathFactor;
+    /*
+    RADIUS = {
+        {Material::GRASS, 2},
+        {Material::MOSS, 6},
+        {Material::CACTUS, 2},
+        {Material::PINE_TREE, 3},
+        {Material::OAK_TREE, 6},
+        {Material::JUNGLE_TREE, 5}
+    };
+    */
+    int radiusCactus = cfg.getConfig().radiusCactus;
+    int radiusPine = cfg.getConfig().radiusPineTree;
+    int radiusOak = cfg.getConfig().radiusOakTree;
+    int radiusJungle = cfg.getConfig().radiusJungleTree;
+
+    RADIUS[Material::GRASS] = 2;
+    RADIUS[Material::MOSS] = 6;
+    RADIUS[Material::CACTUS] = radiusCactus;
+    RADIUS[Material::PINE_TREE] = radiusPine;
+    RADIUS[Material::OAK_TREE] = radiusOak;
+    RADIUS[Material::JUNGLE_TREE] = radiusJungle;
+}
 
 void VegetationSystem::process(Map& map, float deltaTime) 
 {
