@@ -9,7 +9,7 @@ void MapRenderer2DIso::render2D(const Map& map, Window& window, TextureManager& 
 {
     if(rootChunk == nullptr) // 1. Initialisation de l'arbre de chunks (si pas déjà fait)
     {
-        rootChunk = new Chunk(0, map.getWidth() - 1, 0, map.getHeight() - 1, map);
+        rootChunk = std::make_unique<Chunk>(0, map.getWidth() - 1, 0, map.getHeight() - 1, map);
     }
     
     // 2. Rendu à partir de la racine de l'arbre
@@ -26,7 +26,6 @@ void MapRenderer2DIso::render2D(const Map& map, Window& window, TextureManager& 
     float camY = camera.getY();
     float offsetX = windowWidth / 2.0f;
 
-    float seaLevel = 0.40f; 
     float elevationScale = 120.0f; 
     
     // passer à tileH / 4 si le gap est trop visible.

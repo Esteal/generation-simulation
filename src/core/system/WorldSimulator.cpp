@@ -2,12 +2,18 @@
 #include <iostream>
 #include <algorithm>
 
-void WorldSimulator::addSystem(ISimulationSystem* system) {
-    systems.push_back(system);
+void WorldSimulator::addSystem(std::unique_ptr<ISimulationSystem> system) {
+    systems.push_back(std::move(system));
 }
 
 void WorldSimulator::removeSystem(ISimulationSystem* system) {
-    systems.erase(std::remove(systems.begin(), systems.end(), system), systems.end());
+    systems.erase(
+        std::remove_if(systems.begin(), systems.end(),
+            [system](const std::unique_ptr<ISimulationSystem>& ptr) {
+                return ptr.get() == system;
+            }),
+        systems.end()
+    );
 }
 
 void WorldSimulator::setSpeed(float speed) {
@@ -20,7 +26,7 @@ void WorldSimulator::setPause(bool paused) {
 
 void WorldSimulator::update(Map& map, float delta_time) {
     if (!isPaused) {
-        for (ISimulationSystem* system : systems) {
+        for (const std::unique_ptr<ISimulationSystem>& system : systems) {
             system->process(map, delta_time);
         }
     }
@@ -44,8 +50,10 @@ bool WorldSimulator::testRegression() {
         return false;
     }
     
-    MockSystem* mock = new MockSystem();
-    sim.addSystem(mock);
+    auto mockUnique = std::make_unique<MockSystem>();
+    MockSystem* mock = mockUnique.get();
+    sim.addSystem(std::move(mockUnique));
+
     Map dummyMap(10, 10);
     
     // Test exécution normale

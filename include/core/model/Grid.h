@@ -4,63 +4,140 @@
 #include <vector>
 #include <iostream>
 #include <cassert>
+
 /**
  * @file Grid.h
  * @brief Déclaration de la classe Grid
+ * 
  * Cette classe représente une grille de cellules générique, permettant de stocker et manipuler des données de type T.
  * Elle fournit des méthodes pour accéder et modifier les cellules, ainsi que pour obtenir les dimensions de la grille.
-*/
+ */
 
- template<typename T>
+template<typename T>
 /**
  * @class Grid
- * @brief Représente une grille de cellules
- * Cette classe générique permet de créer une grille de n'importe quel type de cellule.
- * Elle gère les dimensions de la grille et fournit des méthodes pour accéder et modifier les cellules
+ * @brief Représente une grille de cellules générique
+ * 
+ * Cette classe template permet de créer une grille de n'importe quel type de cellule.
+ * Elle gère les dimensions de la grille et fournit des méthodes pour accéder et modifier les cellules.
+ * La grille est stockée en mémoire sous forme linéaire et indexée en row-major order (Y * width + X).
+ * 
+ * @tparam T Le type de données stocké dans chaque cellule de la grille
  */
 class Grid
 {
 private:
-    size_t width; 
-    size_t height;
-    std::vector<T> tab;
+    size_t width;           /**< Largeur de la grille (nombre de colonnes) */
+    size_t height;          /**< Hauteur de la grille (nombre de lignes) */
+    std::vector<T> tab;     /**< Stockage linéaire des cellules en row-major order */
 
 public:
-    // Constructeurs
+    /**
+     * @brief Constructeur par défaut
+     * 
+     * Initialise une grille vide avec une largeur et hauteur de 0.
+     */
     Grid() : width(0), height(0) {}
+
+    /**
+     * @brief Constructeur avec dimensions
+     * 
+     * Initialise une grille avec les dimensions spécifiées.
+     * 
+     * @param w Largeur de la grille (nombre de colonnes)
+     * @param h Hauteur de la grille (nombre de lignes)
+     */
     Grid(size_t w, size_t h) : width(w), height(h), tab(w*h) {}
 
-    // Accès aux cellules
+    /**
+     * @brief Accède à une cellule en lecture/écriture
+     * 
+     * @param x Coordonnée X (colonne) de la cellule
+     * @param y Coordonnée Y (ligne) de la cellule
+     * @return Référence mutable à la cellule situé à (x, y)
+     */
     T& get(size_t x, size_t y)
     {
         return tab[y * width + x];
     }
-    // Accesseur
+
+    /**
+     * @brief Accède à une cellule en lecture seule
+     * 
+     * @param x Coordonnée X (colonne) de la cellule
+     * @param y Coordonnée Y (ligne) de la cellule
+     * @return Référence constante à la cellule situé à (x, y)
+     */
     const T& get(size_t x, size_t y) const
     {
         return tab[y * width + x];
     }
-    // Mutateur
+
+    /**
+     * @brief Modifie la valeur d'une cellule
+     * 
+     * @param x Coordonnée X (colonne) de la cellule
+     * @param y Coordonnée Y (ligne) de la cellule
+     * @param value Nouvelle valeur à assigner à la cellule
+     */
     void set(size_t x, size_t y, const T& value)
     {
         tab[y * width + x] = value;
     }
 
-    // Opérateur pratique
+    /**
+     * @brief Opérateur d'accès en lecture/écriture
+     * 
+     * Fournit un accès pratique aux cellules de la grille.
+     * 
+     * @param x Coordonnée X (colonne) de la cellule
+     * @param y Coordonnée Y (ligne) de la cellule
+     * @return Référence mutable à la cellule situé à (x, y)
+     */
     T& operator()(size_t x, size_t y)
     { 
         return tab[y * width + x]; 
     }
 
+    /**
+     * @brief Opérateur d'accès en lecture seule
+     * 
+     * @param x Coordonnée X (colonne) de la cellule
+     * @param y Coordonnée Y (ligne) de la cellule
+     * @return Référence constante à la cellule situé à (x, y)
+     */
     const T& operator()(size_t x, size_t y) const 
     { 
         return tab[y * width + x]; 
     }
 
-    // Dimensions
+    /**
+     * @brief Obtient la largeur de la grille
+     * 
+     * @return Largeur (nombre de colonnes) de la grille
+     */
     size_t getWidth() const { return width; }
+
+    /**
+     * @brief Obtient la hauteur de la grille
+     * 
+     * @return Hauteur (nombre de lignes) de la grille
+     */
     size_t getHeight() const { return height; }
 
+    /**
+     * @brief Fonction de test de régression pour la classe Grid
+     * 
+     * Teste les fonctionnalités principales de la classe Grid :
+     * - Constructeurs et dimensions
+     * - Accès et modification des cellules
+     * - Opérateurs de parenthèse
+     * - Copie profonde des données
+     * - Généricité avec différents types
+     * - Accès const
+     * 
+     * @return true si tous les tests sont passés, false sinon
+     */
     static bool testRegression()
     {
         std::cout << "[Test] Grid (Template)... ";

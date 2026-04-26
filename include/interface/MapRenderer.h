@@ -40,6 +40,14 @@ private:
                          const int &mouseX, const int &mouseY,
                          const Camera2D &camera);
     
+    /**
+     * @brief Rendu des factions sur la carte.
+     * @param window La fenêtre de rendu cible.
+     * @param camera La caméra 2D pour convertir les coordonnées.
+     * @param factions La liste des factions à afficher.
+     * @param windowWidth La largeur de la fenêtre.
+     * @param windowHeight La hauteur de la fenêtre.
+     */
     void renderFactions(Window &window, const Camera2D &camera, const std::vector<Faction> &factions,
                             const size_t &windowWidth, const size_t &windowHeight);
     

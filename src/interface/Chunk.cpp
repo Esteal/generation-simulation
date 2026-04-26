@@ -1,9 +1,11 @@
 #include "Chunk.h"
 #include <algorithm> // Pour std::min et std::max
-
+#include "ConfigManager.h"
 Chunk::Chunk(int x1, int x2, int y1, int y2, const Map& map)
     : minX(x1), maxX(x2), minY(y1), maxY(y2), left(nullptr), right(nullptr) 
 {
+    ConfigManager& cfg = ConfigManager::getInstance();
+    seaLevel = cfg.getConfig().seaLevel;
     // 1. On calcule les limites visuelles (AABB) pour CE morceau de carte
     this->computeAABB(map);
 
@@ -43,7 +45,6 @@ void Chunk::computeAABB(const Map& map) {
     const float tileW = 32.0f; // Taille de la tuile en pixels (doit correspondre à ta spritesheet)
     const float tileH = tileW / 2.0f;
     const float elevationScale = 400.0f;
-    const float seaLevel = 0.40f;
 
     for (int y = minY; y <= maxY; ++y) {
         for (int x = minX; x <= maxX; ++x) {
@@ -115,7 +116,6 @@ void Chunk::render(Window& window, TextureManager& tm, const Camera2D& cam,
         float tileH = tileW / 2.0f;
         float scale = cam.getZoom() / 32.0f; 
         float elevationScale = 400.0f * scale; 
-        float seaLevel = 0.40f;
         int step = std::max(1, (int)(tileH / 2.0f));
         float offsetX = winW / 2.0f;
 
@@ -125,7 +125,7 @@ void Chunk::render(Window& window, TextureManager& tm, const Camera2D& cam,
                 const Cell& cell = map.getGrid().get(x, y);
                 float currentAlt = map.getAltitude(x, y);
                 float elevation = (currentAlt > seaLevel) ? (currentAlt - seaLevel) * elevationScale : 0.0f;
-
+                
                 int destX = (int)((x - y) * (tileW / 2.0f) - cam.getX() + offsetX);
                 int baseDestY = (int)((x + y) * (tileH / 2.0f) - cam.getY());
                 int finalDestY = (int)(baseDestY - elevation);

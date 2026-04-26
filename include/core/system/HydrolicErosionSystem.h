@@ -85,6 +85,10 @@ public:
      */
     void process(Map& map, float deltaTime) override;
 
+    /**
+     * @brief Constructeur par défaut.
+     * * Initialise les paramètres d'érosion avec des valeurs par défaut raisonnables.
+     */
     HydrolicErosionSystem();
 
     /**

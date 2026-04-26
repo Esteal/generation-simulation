@@ -9,6 +9,7 @@
 #include "Map.h"
 #include "ISimulationSystem.h"
 #include <vector>
+#include <memory>
 
 /**
  * @class WorldSimulator
@@ -21,7 +22,7 @@
 class WorldSimulator {
 private:
     /** @brief Liste des systèmes de simulation à exécuter à chaque mise à jour. */
-    std::vector<ISimulationSystem*> systems;
+    std::vector<std::unique_ptr<ISimulationSystem>> systems;
     
     /** @brief État de la simulation (en pause ou en cours d'exécution). */
     bool isPaused;
@@ -42,11 +43,16 @@ public:
      * dans l'ordre de cette liste .
      * @param system Pointeur vers le système de simulation à enregistrer.
      */
-    void addSystem(ISimulationSystem* system);
+    void addSystem(std::unique_ptr<ISimulationSystem> system);
 
+    /**
+     * @brief Supprime un système de la chaîne de simulation.
+     * * Permet de retirer un système spécifique de la liste d'exécution. 
+     * @param system Pointeur vers le système de simulation à supprimer.
+     */
     void removeSystem(ISimulationSystem* system);
 
-    ISimulationSystem* getSystem(size_t index) { return systems[index]; }
+    ISimulationSystem* getSystem(size_t index) { return systems[index].get(); }
     /**
      * @brief Modifie la vitesse globale de la simulation.
      * @param speed Le nouveau multiplicateur de vitesse.

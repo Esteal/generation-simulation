@@ -39,7 +39,7 @@
         "replant_chance": 0.800000011920929
     },
     "general": {
-        "sea_level": 0.4020000100135803
+        "sea_level": 0.35600000619888306
     },
     "hydrolic_erosion": {
         "k": 0.10000000149011612,
@@ -48,14 +48,14 @@
     },
     "hydrologie": {
         "drop_off": 0.10000000149011612,
-        "river_threshold": 50.0
+        "river_threshold": 97.70500183105469
     },
     "light": {
         "num_directions": 8,
         "radius": 10
     },
     "map_generator": {
-        "altitude_frequency": 0.02630000002682209,
+        "altitude_frequency": 0.00800000037997961,
         "altitude_gain": 0.25,
         "altitude_lacunarity": 2.0,
         "altitude_octaves": 6,

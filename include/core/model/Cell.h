@@ -15,40 +15,42 @@
 enum class Material : uint8_t
 {
     // Végétation naturelle
-    NONE,           /**< Terre battue, roche, sable */
+    NONE,           /**< Littérlement rien */
     GRASS,          /**< Herbes simples */
     MOSS,           /**< Mousse et fougères (Fonds sombres et humides) */
     CACTUS,         /**< Désert chaud et sec */
     PINE_TREE,      /**< Conifères (Froid) */
     OAK_TREE,       /**< Chênes / Forêts feuillues (Tempéré) */
-    JUNGLE_TREE,     /**< Arbres tropicaux (Chaud et très humide) */
+    JUNGLE_TREE,    /**< Arbres tropicaux (Chaud et très humide) */
 
     // Ressources minérales 
-    BRONZE_ORE,      /**< Minerai de bronze (Ressource de base pour les civilisations primitives) */
-    IRON_ORE,        /**< Minerai de fer (Ressource avancée pour les civilisations plus développées) */
-    COAL_ORE,        /**< Minerai de charbon (Ressource pour la production d'énergie et la métallurgie) */
-    GOLD_ORE,        /**< Minerai d'or (Ressource précieuse pour le commerce et les civilisations avancées) */
+    BRONZE_ORE,     /**< Minerai de bronze (Ressource de base pour les civilisations primitives) */
+    IRON_ORE,       /**< Minerai de fer (Ressource avancée pour les civilisations plus développées) */
+    COAL_ORE,       /**< Minerai de charbon (Ressource pour la production d'énergie) */
+    GOLD_ORE,       /**< Minerai d'or (Ressource précieuse pour le commerce et les civilisations avancées - non implémentée) */
 
     // Agriculture
-    WHEAT           /**< Blé (Céréale de base pour l'alimentation */
-
-    // Civilisation
-    
+    WHEAT           /**< Blé (Céréale de base pour l'alimentation) */
 };
 
+/**
+ * @enum Stage
+ * @brief Énumération des stades de développement d'une cellule.
+ */
 enum class Stage : uint8_t
 {
-    UNDEFINED = 0,
-    STAGE_1 = 1,
-    STAGE_2 = 2,
-    STAGE_3 = 3,
-    STAGE_4 = 4
+    UNDEFINED = 0,  /**< Stade non défini */
+    STAGE_1 = 1,    /**< Premier stade de développement */
+    STAGE_2 = 2,    /**< Deuxième stade de développement */
+    STAGE_3 = 3,    /**< Troisième stade de développement */
+    STAGE_4 = 4     /**< Quatrième stade de développement */
 };
 
 /**
  * @struct Cell
  * @brief Représente une cellule unique (ou tuile) sur la grille de la carte.
- * * Cette structure fondamentale agit comme un conteneur de données pour chaque point 
+ * 
+ * Cette structure fondamentale agit comme un conteneur de données pour chaque point 
  * du monde. Elle stocke l'état géologique, climatique et biologique local, qui sera 
  * lu et modifié par les différents systèmes de simulation (ErosionSystem, HydrologieSystem, etc.).
  */
@@ -60,12 +62,12 @@ struct Cell
     float humidity;                     /**< Humidité locale (favorise la pousse de la végétation et détermine le biome). */
     float light;                        /**< Quantité de lumière solaire atteignant la cellule (influence la croissance de la végétation). */
     float attractivityLevel;            /**< Niveau d'attractivité pour les civilisations, basé sur la combinaison de facteurs environnementaux. */
-    float pourcentageEvolution = 0.0f;  /**< Pourcentage d'évolution de la cellule, utilisé pour les transitions progressives (ex: désertification, reforestation). */
-    Stage stage = Stage::UNDEFINED;     /**< Stade de développement de la cellule */   
-    bool isOccupied = false;
-    int faction = 0;                    /**< Si différent de 0 alors signifie la propriété d'une faction */
+    float pourcentageEvolution;         /**< Pourcentage d'évolution de la cellule, utilisé pour les transitions progressives (ex: désertification, reforestation). */
+    Stage stage;                        /**< Stade de développement de la cellule. */   
+    bool isOccupied;                    /**< Indique si la cellule est occupée par une civilisation. */
+    int faction;                        /**< Identifiant de la faction propriétaire. 0 signifie non occupée. */
     BiomeIndex biome;                   /**< Type d'écosystème final assigné à la cellule pour son rendu visuel. */
-    Material material = Material::NONE; /**< Type de végétation présente sur la cellule, déterminé par les conditions climatiques. */
+    Material material;                  /**< Type de végétation ou ressource minérale présente sur la cellule, déterminé par les conditions climatiques. */
 };
 
 #endif // CELL_H

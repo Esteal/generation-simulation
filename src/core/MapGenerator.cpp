@@ -6,6 +6,7 @@ MapGenerator::MapGenerator(int seed)
     : seed(seed)
 {
     const GameConfig& cfg = ConfigManager::getInstance().getConfig();
+    seaLevel = cfg.seaLevel;
 
     noiseAltitude.SetSeed(seed);
     noiseTemperature.SetSeed(seed + 1);
@@ -37,57 +38,6 @@ void MapGenerator::setSeed(int newSeed)
     noiseHumidity.SetSeed(newSeed + 2);
 }
 
-/*void MapGenerator::generate(Map &map)
-{  
-    
-    //std::vector<float> altitudeValues(map.getWidth() * map.getHeight()); 
-    for(size_t y = 0; y < map.getHeight(); ++y)
-    {
-        for(size_t x = 0; x < map.getWidth(); ++x)
-        {
-            Cell& cell = map.getGrid().get((float)x, (float)y);
-            float bonusRelief = 0.0f;
-            float fx = (float)x;
-             float fy = (float)y;
-            //cell.bedrock = 1 - 2 * abs(noiseAltitude.GetNoise((float)x, (float)y)); // Valeurs entre 0 et 2, avec des montagnes plus hautes que les océans
-            //float altNoise = noiseAltitude.GetNoise((float)x, (float)y);
-            
-            cell.bedrock = (1 + noiseAltitude.GetNoise((float)x, (float)y))/2.0f;
-            cell.temperature = (1 + noiseTemperature.GetNoise((float)x, (float)y))/2.0f;
-            cell.humidity = (1 + noiseHumidity.GetNoise((float)x, (float)y))/2.0f;
-            cell.granular = (1 + noiseGranular.GetNoise((float)x, (float)y))/8.0f; 
-            //cell.biome = determineBiome(cell.altitude, cell.temperature, cell.humidity);
-            //altitudeValues[y * map.getWidth() + x] = cell.bedrock;
-            // cell.biome = BiomeIndex::BEACH;
-            cell.biome = determineBiome(cell.bedrock, cell.temperature, cell.humidity, cell.granular);
-            
-            switch (cell.biome) {
-                case BiomeIndex::MOUNTAINS:
-                    // On utilise un bruit de type "Ridge" (Slide 8) pour les pics
-                    bonusRelief = 1.0f - std::abs(noiseAltitude.GetNoise(fx * 2.0f, fy * 2.0f));
-                    cell.bedrock += bonusRelief * 0.5f; 
-                    break;
-
-                case BiomeIndex::DESERT:
-                    // On peut simuler des dunes avec un bruit directionnel ou sinusoïdal (Marble)
-                    bonusRelief = std::sin(fx * 0.2f + noiseAltitude.GetNoise(fx, fy) * 5.0f);
-                    cell.bedrock += bonusRelief * 0.05f;
-                    break;
-
-                case BiomeIndex::OCEAN:
-                    // On lisse le fond marin
-                    cell.bedrock *= 0.8f; 
-                    break;
-
-                default:
-                    // Bruit standard de turbulence pour les autres biomes
-                    cell.bedrock += noiseAltitude.GetNoise(fx * 4.0f, fy * 4.0f) * 0.1f;
-                    break;
-            }
-        }
-    }
-}
-*/
 void MapGenerator::generate(Map &map)
 {  
     for(size_t y = 0; y < map.getHeight(); ++y)
@@ -98,101 +48,56 @@ void MapGenerator::generate(Map &map)
             float fx = (float)x;
             float fy = (float)y;
 
-            // 1. LE CONTINENT DE BASE (Collines douces)
+            // 1. LE CONTINENT DE BASE
             float baseNoise = (1.0f + noiseAltitude.GetNoise(fx, fy)) / 2.0f;
 
-            // 2. LES MONTAGNES SPECTACULAIRES (Ridged Noise)
-            // On utilise une fréquence un peu plus haute (x2.5) pour les montagnes
+            // 2. LES MONTAGNES SPECTACULAIRES
             float mountainNoise = 1.0f - std::abs(noiseAltitude.GetNoise(fx * 2.5f, fy * 2.5f));
-            // L'exponentiation rend les pics acérés et aplatit les bases
             mountainNoise = std::pow(mountainNoise, 3.0f); 
-
-            // On combine : Les montagnes poussent en fonction de l'altitude de base
-            // (Evite d'avoir des pics géants au fond de l'océan)
             cell.bedrock = baseNoise + (mountainNoise * baseNoise * 1.5f);
 
-            // 3. CONTRASTE GLOBAL (Aplatit les vallées, élève les sommets)
-            // Ajuste la puissance (1.2f à 2.0f) selon l'agressivité voulue
+            // 3. CONTRASTE GLOBAL
             cell.bedrock = std::pow(cell.bedrock, 1.2f);
 
-            // 4. LES CREVASSES ET FAILLES
-            // On utilise un autre bruit (par ex Temperature ou un nouveau) avec une haute fréquence
+            // =======================================================
+            // 4. LISSAGE DU LITTORAL (Correction de l'effet falaise)
+            // =======================================================
+            float coastZone = 0.06f; // L'épaisseur de la côte qui sera lissée (à ajuster selon vos goûts)
             
+            // Si la terre est juste au-dessus du niveau de l'eau...
+            if (cell.bedrock > seaLevel && cell.bedrock < seaLevel + coastZone) {
+                
+                // 't' va de 0 (pile au niveau de l'eau) à 1 (fin de la plage)
+                float t = (cell.bedrock - seaLevel) / coastZone; 
+                
+                // On met 't' au carré. Cela force la pente à devenir parfaitement 
+                // plate (tangente) au moment où elle touche l'eau.
+                float smoothTransition = t * t; 
+                
+                // On applique la nouvelle altitude lissée
+                cell.bedrock = seaLevel + (smoothTransition * coastZone);
+            }
+            // =======================================================
 
-            // On s'assure que le bedrock reste dans des valeurs gérables pour la suite
+            // On s'assure que le bedrock reste gérable
             cell.bedrock = std::max(0.0f, cell.bedrock);
 
-            // --- SUITE DE TON CODE INCHANGÉE ---
+            // Température, humidité et sédiments...
             cell.temperature = (1 + noiseTemperature.GetNoise(fx, fy))/2.0f;
             cell.humidity = (1 + noiseHumidity.GetNoise(fx, fy))/2.0f;
-            cell.granular = 0.05f; 
-            
-            cell.biome = determineBiome(cell.bedrock, cell.temperature, cell.humidity, cell.granular);
-            
-            // Tu peux garder ton switch pour des retouches cosmétiques (ex: lisser l'océan), 
-            // mais l'essentiel du relief est déjà fait !
-            switch (cell.biome) {
-                case BiomeIndex::DESERT:
-                    cell.bedrock += std::sin(fx * 0.2f + noiseAltitude.GetNoise(fx, fy) * 5.0f) * 0.05f;
-                    break;
-                case BiomeIndex::OCEAN:
-                    cell.bedrock = 0.40f;
-                    break;
-                default:
-                    break;
-            }
+            cell.granular = (1 + noiseGranular.GetNoise(fx, fy))/8.0f; 
         }
     }
 }
 
-void MapGenerator::generateFromBiome(Map &map)
-{
-    for(size_t y = 0; y < map.getHeight(); ++y)
-    {
-        for(size_t x = 0; x < map.getWidth(); ++x)
-        {
-            Cell& cell = map.getGrid().get(x, y);
-            float bonusRelief = 0.0f;
-            float fx = (float)x;
-            float fy = (float)y;
-
-            switch (cell.biome) {
-                case BiomeIndex::MOUNTAINS:
-                    // On utilise un bruit de type "Ridge" (Slide 8) pour les pics
-                    bonusRelief = 1.0f - std::abs(noiseAltitude.GetNoise(fx * 2.0f, fy * 2.0f));
-                    cell.bedrock += bonusRelief * 0.5f; 
-                    break;
-
-                case BiomeIndex::DESERT:
-                    // On peut simuler des dunes avec un bruit directionnel ou sinusoïdal (Marble)
-                    bonusRelief = std::sin(fx * 0.2f + noiseAltitude.GetNoise(fx, fy) * 5.0f);
-                    cell.bedrock += bonusRelief * 0.05f;
-                    break;
-
-                case BiomeIndex::OCEAN:
-                    // On lisse le fond marin
-                    cell.bedrock *= 0.8f; 
-                    break;
-
-                default:
-                    // Bruit standard de turbulence pour les autres biomes
-                    cell.bedrock += noiseAltitude.GetNoise(fx * 4.0f, fy * 4.0f) * 0.1f;
-                    break;
-            }
-        }
-    }
-}
-
-void MapGenerator::setBiome(Map &map)
+void MapGenerator::setBiome(Map& map)
 {
     for(size_t y = 0; y < map.getHeight(); ++y)
     {
         for(size_t x = 0; x < map.getWidth(); ++x)
         {
             Cell& cell = map.getGrid().get((float)x, (float)y);
-            cell.biome = determineBiome(map.getAltitude(x, y), cell.temperature, cell.humidity, cell.granular);
-            if (cell.biome == BiomeIndex::OCEAN)
-                cell.humidity = 1.0f;
+            cell.biome = determineBiome(cell.bedrock, cell.temperature, cell.humidity, cell.granular);
         }
     }
 }
@@ -208,7 +113,6 @@ BiomeIndex MapGenerator::determineBiome(float alt, float temp, float humid, floa
     const float fertileThreshold = 0.12f; // Si granular > 0.12, c'est un delta ou une vallée pleine de sédiment
 
     // --- RELIEF ---
-    const float seaLevel      = 0.40f; // Altitude de l'océan (40% de la carte sous l'eau)
     const float beachWidth    = 0.05f; // Épaisseur de la bande de sable sur les côtes
     const float mountainLevel = 0.75f; // Altitude à partir de laquelle la roche remplace l'herbe
 

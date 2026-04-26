@@ -58,6 +58,10 @@ private:
     void transferMaterial(Cell& currentCell, Cell& lowestCell, float maxDiff) const;
 
 public:
+    /**
+     * @brief Constructeur par défaut.
+     * * Initialise les paramètres d'érosion thermique avec des valeurs par défaut raisonnables.
+     */
     ThermalErosionSystem();
 
     /**

@@ -127,5 +127,14 @@
   },
   "territory_system": {
     "tension_factor": 5
-  }
+  },
+  "map_generator": {
+        "altitude_frequency": 0.008,
+        "altitude_gain": 0.25,
+        "altitude_lacunarity": 2.0,
+        "altitude_octaves": 6,
+        "granular_frequency": 0.05,
+        "humidity_frequency": 0.005,
+        "temperature_frequency": 0.005
+    }
 }

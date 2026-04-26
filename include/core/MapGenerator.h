@@ -23,6 +23,9 @@
 class MapGenerator
 {
 private:
+
+    float seaLevel; /**< Seuil d'altitude définissant le niveau de la mer, configurable via GameConfig. */
+
     /** @brief Générateur de bruit dédié à la topologie (roche mère / bedrock). */
     FastNoiseLite noiseAltitude;
     
@@ -66,20 +69,12 @@ public:
     void generate(Map& map);
 
     /**
-     * @brief Regénère ou adapte le terrain en se basant sur une carte de biomes préexistante.
-     * * Utile si la carte a été chargée depuis un fichier ou modifiée manuellement, 
-     * afin de recalculer des altitudes et températures cohérentes avec les biomes actuels.
-     * * @param[in,out] map La carte à traiter.
+     * @brief Applique la classification des biomes à chaque cellule de la carte.
+     * * Après la génération initiale du terrain, cette méthode parcourt chaque cellule
+     * pour déterminer son biome en fonction de ses caractéristiques physiques et climatiques.
+     * * @param[in,out] map La carte à modifier en assignant les biomes
      */
-    void generateFromBiome(Map &map);
-
-    /**
-     * @brief Recalcule et assigne les biomes de toutes les cellules de la carte.
-     * * Doit être appelée après la génération initiale, ou après le passage 
-     * des systèmes d'érosion qui modifient la terre (granular) et la roche.
-     * * @param[in,out] map La carte dont les biomes doivent être mis à jour.
-     */
-    void setBiome(Map &map);
+    void setBiome(Map& map);
 
     /**
      * @brief Modifie la graine de génération et réinitialise les moteurs de bruit.

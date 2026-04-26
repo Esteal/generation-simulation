@@ -16,15 +16,17 @@ Application::Application(size_t width, size_t height, size_t mapWidth, size_t ma
     generator.generate(map);
 
     // algos de simulation ayant besoin de temps (deltaTime) qui s'écoule pour marquer le terrain
-    worldSimulator.addSystem(new HydrolicErosionSystem());
-    worldSimulator.addSystem(new ThermalErosionSystem());
+    worldSimulator.addSystem(std::make_unique<HydrolicErosionSystem>());
+    worldSimulator.addSystem(std::make_unique<ThermalErosionSystem>());
     //std::cout << "Application de l'érosion hydraulique..." << std::endl;
-    worldSimulator.update(map, 3.0f);
+    worldSimulator.update(map, 10.0f);
+    
+    generator.setBiome(map);
     // algos ayant besoin de temps (deltaTime) à 0 pour s'exécuter une seule fois au lancement
-    worldSimulator.addSystem(new HydrologieSystem());
-    worldSimulator.addSystem(new LightSystem());
-    worldSimulator.addSystem(new MineralSystem());
-    worldSimulator.addSystem(new VegetationSystem());
+    worldSimulator.addSystem(std::make_unique<HydrologieSystem>());
+    worldSimulator.addSystem(std::make_unique<LightSystem>());
+    worldSimulator.addSystem(std::make_unique<MineralSystem>());
+    worldSimulator.addSystem(std::make_unique<VegetationSystem>());
     worldSimulator.update(map, 0.0f);
 
 
@@ -36,9 +38,9 @@ Application::Application(size_t width, size_t height, size_t mapWidth, size_t ma
 
     
     // algos de simulation qui n'initialise rien, modifie seulement le terrain
-    worldSimulator.addSystem(new TerritorySystem());
-    worldSimulator.addSystem(new CivilisationSystem(map));
-    worldSimulator.addSystem(new AgricultureSystem());
+    worldSimulator.addSystem(std::make_unique<TerritorySystem>());
+    worldSimulator.addSystem(std::make_unique<CivilisationSystem>(map));
+    worldSimulator.addSystem(std::make_unique<AgricultureSystem>());
 
     textureManager.load("sprite2D", "spritesheet2D.png", window);
     textureManager.load("sprite2DIso", "spritesheet2DIso.png", window);

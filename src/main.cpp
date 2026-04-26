@@ -143,6 +143,24 @@ bool runLauncher() {
             ImGui::SliderInt("Facteur tension", &config.tensionFactor, 0, 50);
         }
 
+        ImGui::Spacing();
+        ImGui::Separator();
+        ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.0f, 0.6f, 0.6f)); // Rouge discret pour le bouton reset
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.0f, 0.7f, 0.7f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.0f, 0.8f, 0.8f));
+
+        if (ImGui::Button("REINITIALISER LES PARAMETRES (sampleCopie.json)", ImVec2(-1, 30))) {
+            // 1. On charge les données du fichier de secours
+            if (ConfigManager::getInstance().loadConfig("sampleCopie.json", "config/")) {
+                // 2. On écrase immédiatement le config.json actuel avec ces données propres
+                ConfigManager::getInstance().saveConfig("config.json", "config/");
+                std::cout << "Configuration restauree depuis sampleCopie.json" << std::endl;
+            }
+        }
+        
+        ImGui::PopStyleColor(3);
+        ImGui::Spacing();
+
         
 
         ImGui::Spacing();
